@@ -6,6 +6,7 @@ exports.dataController = {
     async getData(req, res) {
         try {
             const { table } = req.params;
+            console.log(table);
             const data = await data_service_1.dataService.getData(table);
             res.json(data);
         }
@@ -42,5 +43,17 @@ exports.dataController = {
         catch (error) {
             res.status(500).json({ error: error.message });
         }
-    }
+    },
+    async getMembers(req, res) {
+        try {
+            const { user_type, grade } = req.query;
+            const data = await data_service_1.dataService.getData('TEST_MEMBER', { user_type: user_type, grade: grade });
+            res.json(data);
+        }
+        catch (error) {
+            res.status(500).json({
+                error: error.message || '멤버 데이터 조회 중 오류가 발생했습니다.'
+            });
+        }
+    },
 };

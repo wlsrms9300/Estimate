@@ -1,8 +1,18 @@
 import { supabase } from '../config/supabase';
 
 export const dataService = {
-    async getData(tableName: string) {
-        const { data, error } = await supabase.from(tableName).select("*");
+    async getData(tableName: string, filters?: { user_type?: string; grade?: string }) {
+        let query = supabase.from(tableName).select("*"); 
+        if (filters) {
+            if (filters.user_type) {
+                query = query.eq("user_type", filters.user_type);
+            }
+            if (filters.grade) {
+                query = query.eq("grade", filters.grade);
+            }
+        }
+        
+        const { data, error } = await query;
         if (error) throw error;
         return data;
     },
@@ -30,5 +40,5 @@ export const dataService = {
         const { error } = await supabase.from(tableName).delete().eq("id", id);
         if (error) throw error;
         return true;
-    }
+    },
 };
