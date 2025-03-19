@@ -1,0 +1,23 @@
+# Build directories
+dist
+dist-ssr
+beta
+*.local
+
+# Testing
+coverage
+*storybook.log
+
+# Environment files
+.env.development
+.env.production
+.env.local
+
+# TypeScript
+*.tsbuildinfo
+
+# Storybook
+storybook-static/
+
+# Dependencies
+node_modules
