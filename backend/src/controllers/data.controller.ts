@@ -45,12 +45,14 @@ export const dataController = {
 
     async getMembers(req: Request, res: Response) {
         try {
-            const data = await dataService.getData('TEST_MEMBER');
+            const { user_type, grade } = req.query;
+            const data = await dataService.getData('TEST_MEMBER', { user_type: user_type as string, grade: grade as string  });
             res.json(data);
         } catch (error: any) {
             res.status(500).json({ 
                 error: error.message || '멤버 데이터 조회 중 오류가 발생했습니다.' 
             });
         }
-    }
+    },  
+    
 };
