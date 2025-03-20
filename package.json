@@ -3,13 +3,13 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
-      "frontend": "cd frontend && yarn dev",
-      "backend": "cd backend && yarn dev",
-      "dev": "concurrently \"yarn backend\" \"yarn frontend\"",
-      "build": "concurrently \"cd frontend && yarn build\" \"cd backend && yarn build\"",
-      "install-all": "concurrently \"cd frontend && yarn install\" \"cd backend && yarn install\""
+        "frontend": "cd frontend && yarn dev",
+        "backend": "cd backend && yarn dev",
+        "dev": "concurrently \"yarn backend\" \"yarn frontend\"",
+        "build": "concurrently \"cd frontend && yarn build\" \"cd backend && yarn build\"",
+        "install-all": "concurrently \"cd frontend && yarn install\" \"cd backend && yarn install\""
     },
     "devDependencies": {
-      "concurrently": "^8.2.2"
+        "concurrently": "^8.2.2"
     }
-  }
+}

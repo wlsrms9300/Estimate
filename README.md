@@ -13,7 +13,7 @@
 -   TypeScript
 -   Vite
 -   Ant Design
--   Styled Components
+-   Tailwind CSS
 -   React Query
 -   Recoil
 -   Axios
