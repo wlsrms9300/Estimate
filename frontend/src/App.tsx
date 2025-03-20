@@ -1,4 +1,5 @@
 import 'antd/dist/reset.css'
+import './assets/css/index.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { RecoilRoot } from 'recoil'
@@ -47,15 +48,7 @@ function App() {
             <RecoilRoot>
                 <BrowserRouter>
                     <Routes>
-                        <Route
-                            path="/"
-                            element={
-                                <>
-                                    <Introduce />
-                                    <MemberList />
-                                </>
-                            }
-                        />
+                        {/* <Route path="/" element={<Introduce />} /> */}
                         {/* <Route
                             path="/"
                             element={
