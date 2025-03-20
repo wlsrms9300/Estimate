@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:3000' // 백엔드 서버 주소
+const API_BASE_URL = import.meta.env.VITE_API_URL // 백엔드 서버 주소
 
 export interface Member {
     id: number
