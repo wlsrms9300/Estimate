@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000
 
 app.use(
     cors({
-        origin: process.env.NODE_ENV === 'production' ? 'https://your-production-domain.com' : 'http://localhost:5173',
+        origin: process.env.NODE_ENV === 'production' ? 'https://estimate-frontend.vercel.app' : 'http://localhost:5173',
     }),
 )
 app.use(express.json())
