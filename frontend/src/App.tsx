@@ -48,16 +48,7 @@ function App() {
             <RecoilRoot>
                 <BrowserRouter>
                     <Routes>
-                        {/* <Route path="/" element={<Introduce />} /> */}
-                        {/* <Route
-                            path="/"
-                            element={
-                                <div>
-                                    <h1>API 테스트</h1>
-                                    <MemberList />
-                                </div>
-                            }
-                        /> */}
+                        <Route path="/" element={<Introduce />} />
                     </Routes>
                 </BrowserRouter>
             </RecoilRoot>
