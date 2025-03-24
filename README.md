@@ -34,7 +34,3 @@
 ## API 문서
 
 -   Apidog
-
-## Front 문서
-
--   Storybook
