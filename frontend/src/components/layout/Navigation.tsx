@@ -11,7 +11,7 @@ export default function Navigation() {
     const [siderCollapsed, setSiderCollapsed] = useState(false)
 
     return (
-        <Sider width={240} collapsed={siderCollapsed} className={soMainStyles.sider}>
+        <Sider width={240} collapsed={siderCollapsed} className={soMainStyles.sider} style={{ background: 'white' }}>
             <div className={soMainStyles.siderHeader}>
                 <div className={soMainStyles.siderLogo}>BizSync</div>
             </div>
