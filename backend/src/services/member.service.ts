@@ -1,5 +1,7 @@
 import { supabase } from '../config/supabase'
 import { transformData } from '../utils'
+import { jwtUtils } from '../utils/jwt.utils'
+import { TokenPayload, AuthResponse } from '../interfaces/auth.interface'
 
 export const memberService = {
     async getData(tableName: string, filters?: { userType?: string; grade?: string }) {
@@ -37,7 +39,7 @@ export const memberService = {
         return true
     },
 
-    async login(email: string, password: string) {
+    async login(email: string, password: string): Promise<AuthResponse> {
         const { data, error } = await supabase
             .from('TEST_MEMBER')
             .select('*')
@@ -45,9 +47,32 @@ export const memberService = {
             .eq('password', password) // 실제 구현시에는 반드시 비밀번호 해시화 비교 로직 필요
             .single()
 
-        if (error) throw new Error('로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.')
-        if (!data) throw new Error('사용자를 찾을 수 없습니다.')
+        if (error) {
+            throw new Error('로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.')
+        }
+        if (!data) {
+            throw new Error('사용자를 찾을 수 없습니다.')
+        }
 
-        return data
+        // 토큰 페이로드 생성
+        const tokenPayload: TokenPayload = {
+            user_id: data.id,
+            userType: data.user_type,
+        }
+
+        // 토큰 생성
+        const { accessToken, refreshToken } = jwtUtils.generateTokens(tokenPayload)
+
+        // 리프레시 토큰을 데이터베이스에 저장 (선택사항)
+        await this.updateData('TEST_MEMBER', data.id, {
+            refresh_token: refreshToken,
+            last_login_at: new Date(),
+        })
+
+        return {
+            user: transformData.toCamelCase(data),
+            accessToken,
+            refreshToken,
+        }
     },
 }

@@ -11,5 +11,9 @@
     },
     "devDependencies": {
         "concurrently": "^8.2.2"
+    },
+    "dependencies": {
+        "@types/jsonwebtoken": "^9.0.9",
+        "jsonwebtoken": "^9.0.2"
     }
 }

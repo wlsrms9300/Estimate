@@ -18,12 +18,12 @@ export const memberController = {
 
     async signup(req: Request, res: Response) {
         try {
-            const { userId, userName, password } = req.body as unknown as EM_MEMBER
-            console.log(userId, userName, password)
+            const { userId, userName, password, email } = req.body as unknown as EM_MEMBER
             const data = await memberService.createData('TEST_MEMBER', {
                 userId,
                 userName,
                 password,
+                email,
             })
             res.json({ success: true, data })
             console.log(data)
@@ -37,10 +37,25 @@ export const memberController = {
     async login(req: Request, res: Response) {
         try {
             const { email, password } = req.body
-            const user = await memberService.login(email, password)
-            res.json({ success: true, user })
+            const result = await memberService.login(email, password)
+
+            // JWT 토큰을 쿠키에 저장 (선택사항)
+            res.cookie('refreshToken', result.refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+            })
+
+            res.json({
+                success: true,
+                data: {
+                    user: result.user,
+                    accessToken: result.accessToken,
+                },
+            })
         } catch (error: any) {
             res.status(401).json({
+                success: false,
                 error: error.message || '로그인 중 오류가 발생했습니다.',
             })
         }
