@@ -15,18 +15,25 @@ export default function MainLayout() {
             <div className={soMainStyles.fixedContainer}>
                 <div className={soMainStyles.fixedContent}>
                     <Navigation />
-                    <Header className={soMainStyles.header}>
+                    {/* <Header className={soMainStyles.header}>
                         <div className={soMainStyles.headerTitle}></div>
                         <div className={soMainStyles.headerIcons}>
                             <BellOutlined className={soMainStyles.headerIcon} />
                             <UserOutlined className={soMainStyles.headerIcon} />
                         </div>
-                    </Header>
+                    </Header> */}
                 </div>
             </div>
             <div className={soMainStyles.layoutContainer}>
                 <Layout className={soMainStyles.innerLayout}>
                     <Content className={soMainStyles.content}>
+                        <Header className={soMainStyles.header}>
+                            <div className={soMainStyles.headerTitle}></div>
+                            <div className={soMainStyles.headerIcons}>
+                                <BellOutlined className={soMainStyles.headerIcon} />
+                                <UserOutlined className={soMainStyles.headerIcon} />
+                            </div>
+                        </Header>
                         <Outlet />
                     </Content>
                 </Layout>
