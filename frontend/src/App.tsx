@@ -7,6 +7,8 @@ import { getMembers } from './services/memberService'
 
 // pages
 import Introduce from './pages/Introduce'
+import MainLayout from './pages/MainLayout'
+import EstimateMenu from './components/content/EstimateMenu'
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -49,6 +51,9 @@ function App() {
                 <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<Introduce />} />
+                        <Route path="/so" element={<MainLayout />}>
+                            <Route path="estimate" element={<EstimateMenu />} />
+                        </Route>
                     </Routes>
                 </BrowserRouter>
             </RecoilRoot>
