@@ -49,6 +49,16 @@ function App() {
                 <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<Introduce />} />
+                        {/* <Route path="/" element={<Introduce />} /> */}
+                        {/* <Route
+                            path="/"
+                            element={
+                                <div>
+                                    <h1>API 테스트</h1>
+                                    <MemberList />
+                                </div>
+                            }
+                        /> */}
                     </Routes>
                 </BrowserRouter>
             </RecoilRoot>

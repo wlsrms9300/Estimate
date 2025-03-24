@@ -10,6 +10,8 @@
         "install-all": "concurrently \"cd frontend && yarn install\" \"cd backend && yarn install\""
     },
     "devDependencies": {
-        "concurrently": "^8.2.2"
+        "concurrently": "^8.2.2",
+        "@types/jsonwebtoken": "^9.0.9",
+        "jsonwebtoken": "^9.0.2"
     }
 }
