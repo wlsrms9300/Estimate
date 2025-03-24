@@ -1,8 +1,12 @@
-import express from 'express';
-import { dataController } from '../controllers/data.controller';
+import express from 'express'
+import { memberController } from '../controllers/member.controller'
 
-const router = express.Router();
+const router = express.Router()
 
-router.get('/members', dataController.getMembers);
+router.get('/members', memberController.getMembers)
 
-export default router; 
+// 회원 인증 관련 라우트 추가
+router.post('/signup', memberController.signup)
+router.post('/login', memberController.login)
+
+export default router
