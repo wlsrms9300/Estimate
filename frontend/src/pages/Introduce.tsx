@@ -1,10 +1,20 @@
-import { Button } from 'antd'
+import { useState } from 'react'
+import { Button, Modal } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { introduceStyles } from '../styles/introduce.styles'
-
+import { SignIn } from '../components/account/SignIn'
 export default function Introduce() {
     const navigate = useNavigate()
     const heroImage = 'https://public.readdy.ai/ai/img_res/7f809449d14dab68b1e4bf06d1c09041.jpg'
+    const [isModalOpen, setIsModalOpen] = useState(false)
+
+    /**
+     * @function handleCancel
+     * @description 모달 닫기
+     */
+    const handleCancel = () => {
+        setIsModalOpen(false)
+    }
 
     return (
         <div className={introduceStyles.container}>
@@ -12,10 +22,9 @@ export default function Introduce() {
                 <div className={introduceStyles.headerContent}>
                     <div className={introduceStyles.logo}>BizSync</div>
                     <nav className={introduceStyles.nav}>
-                        <a className={introduceStyles.navLink}>서비스 소개</a>
                         <a className={introduceStyles.navLink}>요금제</a>
                         <a className={introduceStyles.navLink}>고객지원</a>
-                        <Button onClick={() => navigate('/so')} className={introduceStyles.primaryButton}>
+                        <Button onClick={() => setIsModalOpen(true)} className={introduceStyles.primaryButton}>
                             시작하기
                         </Button>
                     </nav>
@@ -30,7 +39,7 @@ export default function Introduce() {
                                 복잡한 견적서 작성 과정을 자동화하여 업무 효율을 높이세요. 견적서 자동생성으로 시간을 절약하고 정확성을 높일 수
                                 있습니다.
                             </p>
-                            <Button onClick={() => navigate('/so')} className={introduceStyles.heroButton}>
+                            <Button onClick={() => setIsModalOpen(true)} className={introduceStyles.heroButton}>
                                 무료로 시작하기
                             </Button>
                         </div>
@@ -40,6 +49,9 @@ export default function Introduce() {
                     </div>
                 </section>
             </main>
+            <Modal className="!w-80" title="시작하기" footer={<></>} open={isModalOpen} onCancel={handleCancel}>
+                <SignIn />
+            </Modal>
         </div>
     )
 }
