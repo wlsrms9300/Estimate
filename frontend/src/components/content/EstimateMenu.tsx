@@ -3,12 +3,10 @@ import { Layout } from 'antd'
 import { FileTextOutlined, SettingOutlined, UserOutlined, BellOutlined } from '@ant-design/icons'
 import { estimateMenuStyles } from '../../styles/content/estimatemenu.styles'
 
-// const { Header, Sider, Content } = Layout
-
 export default function EstimateMenu() {
     return (
         <div className={estimateMenuStyles.contentContainer}>
-            <h2 className={estimateMenuStyles.contentTitle}>견적서 작성</h2>
+            {/* <h2 className={estimateMenuStyles.contentTitle}>견적서 작성</h2> */}
             <div className={estimateMenuStyles.contentGrid}>
                 <div className={estimateMenuStyles.newEstimateCard}>
                     <div className="flex items-center justify-between">

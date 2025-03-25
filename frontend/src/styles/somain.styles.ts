@@ -1,16 +1,18 @@
 export const soMainStyles = {
-    layout: '!h-screen !flex !justify-center !bg-gradient-to-r from-[#00c4cc]/20 via-[#6366f1]/70 to-[#8b3dff]/70 backdrop-blur-sm',
+    layout: '!h-screen !flex !justify-center !bg-gradient-to-r from-[#00c4cc]/5 via-[#6366f1]/80 to-[#8b3dff]/80 backdrop-blur-sm',
     layoutContainer: '!w-full !relative !mx-auto !h-full',
-    // fixedContainer: '!fixed !top-0 !left-0 !right-0 !flex !justify-center !z-50',
-    // fixedContent: '!w-full !relative',
     sider: 'px-4 py-2 !bg-transparent !h-full',
-    // !absolute !left-3 !top-3 !bottom-3 !z-50/
     siderHeader: 'pt-3 flex items-center justify-between',
+    siderHeaderSmall: 'pt-3 flex items-center justify-center',
     siderLogo: 'text-2xl font-bold',
     siderMenu: 'py-4 flex flex-col gap-2',
-    siderMenuItem: 'px-4 py-2 text-base font-medium hover:bg-[#6366f1]/10 transition-all duration-200 ease-in-out cursor-pointer rounded-lg',
+    siderMenuItem:
+        'flex items-center h-10 px-4 py-2 text-base font-medium cursor-pointer hover:bg-[#6366f1]/10 transition-all duration-100 ease-in-out rounded-lg text-[#6366f1] hover:text-[#4f46e5]',
+    menuItemSelected: 'bg-[#6366f1]/10',
     siderCreateButton: '!w-full !py-6 !bg-[#6366f1] hover:!bg-[#4f46e5] !text-white !rounded-lg !font-medium !shadow-md !hover:!shadow-lg',
     siderCollapseButton: '!bg-transparent !border-none !shadow-none',
+    sliderIcon: 'text-lg text-[#8b3dff]',
+    sliderCollapseButtonText: 'ml-3 overflow-hidden whitespace-nowrap',
     innerLayout: '!h-full !bg-transparent',
     header: '!bg-transparent !py-2 !px-6 !flex !items-center !justify-end',
     headerTitle: 'text-2xl font-medium text-gray-800',

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef } from 'react'
 import { Layout } from 'antd'
 import { FileTextOutlined, SettingOutlined, UserOutlined, BellOutlined } from '@ant-design/icons'
 import { soMainStyles } from '../styles/somain.styles'
@@ -10,21 +10,11 @@ import { Outlet } from 'react-router-dom'
 const { Header, Sider, Content } = Layout
 
 export default function MainLayout() {
+    const containerRef = useRef<HTMLDivElement>(null)
+
     return (
-        <Layout className={soMainStyles.layout}>
-            {/* <div className={soMainStyles.fixedContainer}>
-                <div className={soMainStyles.fixedContent}>
-                    <Navigation />
-                     <Header className={soMainStyles.header}>
-                        <div className={soMainStyles.headerTitle}></div>
-                        <div className={soMainStyles.headerIcons}>
-                            <BellOutlined className={soMainStyles.headerIcon} />
-                            <UserOutlined className={soMainStyles.headerIcon} />
-                        </div>
-                    </Header> 
-                </div>
-            </div> */}
-            <Navigation />
+        <Layout ref={containerRef} className={soMainStyles.layout}>
+            <Navigation containerRef={containerRef} />
             <div className={soMainStyles.layoutContainer}>
                 <Layout className={soMainStyles.innerLayout}>
                     <Content className={soMainStyles.content}>
