@@ -3,8 +3,6 @@ import { memberController } from '../controllers/member.controller'
 
 const router = express.Router()
 
-router.get('/members', memberController.getMembers)
-
 // 회원 인증 관련 라우트 추가
 router.post('/signup', memberController.signup)
 router.post('/login', memberController.login)

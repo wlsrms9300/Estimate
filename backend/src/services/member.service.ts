@@ -1,7 +1,6 @@
 import { supabase } from '../config/supabase'
-import { transformData } from '../utils'
-import { jwtUtils } from '../utils/jwt.utils'
-import { TokenPayload, AuthResponse } from '../interfaces/auth.interface'
+import { transformData, jwtUtils } from '../utils'
+import { TokenPayload } from '../interfaces/auth.interface'
 
 export const memberService = {
     async getData(tableName: string, filters?: { userType?: string; grade?: string }) {
@@ -20,9 +19,9 @@ export const memberService = {
         return transformData.toCamelCase(data)
     },
 
-    async createData(tableName: string, data: any) {
-        console.log(transformData.toSnakeCase(data))
-        const { data: result, error } = await supabase.from(tableName).insert(transformData.toSnakeCase(data)).select()
+    //회원가입
+    async createMemberData(tableName: string, memberData: any) {
+        const { data: result, error } = await supabase.from(tableName).insert(transformData.toSnakeCase(memberData)).select()
         if (error) throw error
         return transformData.toCamelCase(result)
     },
@@ -39,12 +38,12 @@ export const memberService = {
         return true
     },
 
-    async login(email: string, password: string): Promise<AuthResponse> {
+    async login(memberData: any) {
         const { data, error } = await supabase
-            .from('TEST_MEMBER')
+            .from('EM_MEMBER')
             .select('*')
-            .eq('email', email)
-            .eq('password', password) // 실제 구현시에는 반드시 비밀번호 해시화 비교 로직 필요
+            .eq('user_id', memberData.userId)
+            .eq('password', memberData.password) // 실제 구현시에는 반드시 비밀번호 해시화 비교 로직 필요
             .single()
 
         if (error) {
@@ -56,23 +55,59 @@ export const memberService = {
 
         // 토큰 페이로드 생성
         const tokenPayload: TokenPayload = {
-            user_id: data.id,
-            userType: data.user_type,
+            userId: data.user_id,
+            password: data.password,
         }
 
         // 토큰 생성
         const { accessToken, refreshToken } = jwtUtils.generateTokens(tokenPayload)
 
-        // 리프레시 토큰을 데이터베이스에 저장 (선택사항)
-        await this.updateData('TEST_MEMBER', data.id, {
-            refresh_token: refreshToken,
-            last_login_at: new Date(),
-        })
-
+        await this.updateUserLoginInfo(data.user_id, refreshToken)
         return {
             user: transformData.toCamelCase(data),
             accessToken,
             refreshToken,
+        }
+    },
+
+    async updateUserLoginInfo(userId: string, refreshToken: string) {
+        try {
+            // 현재 시간 설정
+            const currentTimestamp = new Date().toISOString()
+            // 리프레시 토큰 만료 시간 설정 (현재 시간 + 1일)
+            const expiresTimestamp = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+
+            // em_member 테이블 last_login_at 업데이트
+            const { data: result, error: memberUpdateError } = await supabase
+                .from('EM_MEMBER')
+                .update({ last_login_at: currentTimestamp })
+                .eq('user_id', userId)
+            if (memberUpdateError) {
+                throw new Error(`Failed to update last_login_at: ${memberUpdateError.message}`)
+            }
+
+            // em_member_refresh_token 테이블 upsert 수행
+            const { error: tokenUpsertError } = await supabase.from('EM_MEMBER_REFRESH_TOKEN').upsert(
+                {
+                    user_id: userId,
+                    refresh_token: refreshToken,
+                    created_at: currentTimestamp,
+                    expires_at: expiresTimestamp,
+                },
+                {
+                    onConflict: 'user_id',
+                    ignoreDuplicates: false,
+                },
+            )
+
+            if (tokenUpsertError) {
+                throw new Error(`Failed to upsert refresh token: ${tokenUpsertError.message}`)
+            }
+
+            return true
+        } catch (error) {
+            console.error('Error updating user login info:', error)
+            throw error
         }
     },
 }
