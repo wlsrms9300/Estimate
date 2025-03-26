@@ -49,7 +49,7 @@ export default function Introduce() {
                     </div>
                 </section>
             </main>
-            <Modal className="!w-80" title="시작하기" footer={<></>} open={isModalOpen} onCancel={handleCancel}>
+            <Modal className="!w-[500px]" title="" footer={<></>} open={isModalOpen} onCancel={handleCancel}>
                 <SignIn />
             </Modal>
         </div>
