@@ -10,7 +10,7 @@ export default function Introduce() {
 
     /**
      * @function handleCancel
-     * @description 모달 닫기
+     * @description 로그인 모달 닫기
      */
     const handleCancel = () => {
         setIsModalOpen(false)
@@ -49,9 +49,7 @@ export default function Introduce() {
                     </div>
                 </section>
             </main>
-            <Modal className="!w-[500px]" title="" footer={<></>} open={isModalOpen} onCancel={handleCancel}>
-                <SignIn />
-            </Modal>
+            <SignIn isModalOpen={isModalOpen} handleCancel={handleCancel} />
         </div>
     )
 }

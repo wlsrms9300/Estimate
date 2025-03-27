@@ -1,5 +1,5 @@
 export const soMainStyles = {
-    layout: '!h-screen !flex !justify-center !bg-gradient-to-r from-[#00c4cc]/5 via-[#6366f1]/80 to-[#8b3dff]/80 backdrop-blur-sm',
+    layout: '!h-screen !flex !justify-center !bg-gradient-to-r from-[#00c4cc]/5 via-[#6366f1]/80 to-[#8b3dff]/80 backdrop-blur-sm font-["Nunito"]',
     layoutContainer: '!w-full !relative !mx-auto !h-full',
     sider: 'px-4 py-2 !bg-transparent !h-full',
     siderHeader: 'pt-3 flex items-center justify-between',

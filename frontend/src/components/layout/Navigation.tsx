@@ -25,6 +25,12 @@ export default function Navigation({ containerRef }: NavigationProps) {
     const navigate = useNavigate()
     const [siderCollapsed, setSiderCollapsed] = useState(false)
     const [selectedMenu, setSelectedMenu] = useState('')
+    const menu = [
+        { name: '서류함', icon: <FolderOpenOutlined />, selIcon: <FolderOpenFilled />, value: 'documents' },
+        { name: '요금제', icon: <DollarCircleOutlined />, selIcon: <DollarCircleFilled />, value: 'plan' },
+        { name: '업체 관리', icon: <ProductOutlined />, selIcon: <ProductFilled />, value: 'company' },
+        { name: '공지사항', icon: <NotificationOutlined />, selIcon: <NotificationFilled />, value: 'notice' },
+    ]
 
     /**
      * @function handleMenuClick
@@ -36,6 +42,23 @@ export default function Navigation({ containerRef }: NavigationProps) {
         } else {
             setSelectedMenu(menu)
         }
+    }
+
+    /**
+     * @component MenuItems
+     * @description 메뉴 아이템 컴포넌트
+     */
+    const MenuItems = () => {
+        return menu.map((item) => (
+            <Tooltip title={siderCollapsed ? item.name : ''} placement="right">
+                <div
+                    className={`${soMainStyles.siderMenuItem} ${selectedMenu === item.value ? soMainStyles.menuItemSelected : ''}`}
+                    onClick={() => handleMenuClick(item.value)}>
+                    {selectedMenu === item.value ? item.selIcon : item.icon}
+                    <span className={soMainStyles.sliderCollapseButtonText}>{siderCollapsed ? '' : item.name}</span>
+                </div>
+            </Tooltip>
+        ))
     }
 
     useEffect(() => {
@@ -78,54 +101,7 @@ export default function Navigation({ containerRef }: NavigationProps) {
                         {siderCollapsed ? '' : <span>견적서 작성하기</span>}
                     </Flex>
                 </Button>
-                <Tooltip title={siderCollapsed ? '서류함' : ''} placement="right">
-                    <div
-                        className={`${soMainStyles.siderMenuItem} ${selectedMenu === 'documents' ? soMainStyles.menuItemSelected : ''}`}
-                        onClick={() => handleMenuClick('documents')}>
-                        {selectedMenu === 'documents' ? (
-                            <FolderOpenFilled className={soMainStyles.sliderIcon} />
-                        ) : (
-                            <FolderOpenOutlined className={soMainStyles.sliderIcon} />
-                        )}
-                        <span className={soMainStyles.sliderCollapseButtonText}>{siderCollapsed ? '' : '서류함'}</span>
-                    </div>
-                </Tooltip>
-                <Tooltip title={siderCollapsed ? '요금제' : ''} placement="right">
-                    <div
-                        className={`${soMainStyles.siderMenuItem} ${selectedMenu === 'plan' ? soMainStyles.menuItemSelected : ''}`}
-                        onClick={() => handleMenuClick('plan')}>
-                        {selectedMenu === 'plan' ? (
-                            <DollarCircleFilled className={soMainStyles.sliderIcon} />
-                        ) : (
-                            <DollarCircleOutlined className={soMainStyles.sliderIcon} />
-                        )}
-                        <span className={soMainStyles.sliderCollapseButtonText}>{siderCollapsed ? '' : '요금제'}</span>
-                    </div>
-                </Tooltip>
-                <Tooltip title={siderCollapsed ? '업체 관리' : ''} placement="right">
-                    <div
-                        className={`${soMainStyles.siderMenuItem} ${selectedMenu === 'company' ? soMainStyles.menuItemSelected : ''}`}
-                        onClick={() => handleMenuClick('company')}>
-                        {selectedMenu === 'company' ? (
-                            <ProductFilled className={soMainStyles.sliderIcon} />
-                        ) : (
-                            <ProductOutlined className={soMainStyles.sliderIcon} />
-                        )}
-                        <span className={soMainStyles.sliderCollapseButtonText}>{siderCollapsed ? '' : '업체 관리'}</span>
-                    </div>
-                </Tooltip>
-                <Tooltip title={siderCollapsed ? '공지사항' : ''} placement="right">
-                    <div
-                        className={`${soMainStyles.siderMenuItem} ${selectedMenu === 'notice' ? soMainStyles.menuItemSelected : ''}`}
-                        onClick={() => handleMenuClick('notice')}>
-                        {selectedMenu === 'notice' ? (
-                            <NotificationFilled className={soMainStyles.sliderIcon} />
-                        ) : (
-                            <NotificationOutlined className={soMainStyles.sliderIcon} />
-                        )}
-                        <span className={soMainStyles.sliderCollapseButtonText}>{siderCollapsed ? '' : '공지사항'}</span>
-                    </div>
-                </Tooltip>
+                <MenuItems />
             </div>
         </Sider>
     )

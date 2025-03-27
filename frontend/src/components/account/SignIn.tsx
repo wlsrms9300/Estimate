@@ -1,36 +1,70 @@
-import React from 'react'
-import { Flex, Layout, Typography, Button } from 'antd'
+import { useState, useCallback, useEffect } from 'react'
+import { Flex, Typography, Button, Modal } from 'antd'
 import { accountStyles } from '../../styles/account.styles'
-import LogoText from '../../assets/images/logo-text.png'
-import { MailOutlined } from '@ant-design/icons'
-import Naver from '../../assets/images/naver-icon.png'
-import Kakao from '../../assets/images/kakao.svg'
+// components
+import StepEmail from './StepEmail'
+import StepAuthCode from './StepAuthCode'
+import StepRegUser from './StepRegUser'
+import StepAgree from './StepAgree'
+import StartType from './StartType'
+import { useAuthStore } from '../../stores/authStore'
+interface SignInProps {
+    isModalOpen: boolean
+    handleCancel: () => void
+}
 
-const { Header, Footer, Sider, Content } = Layout
+export const SignIn = ({ isModalOpen, handleCancel }: SignInProps) => {
+    const [step, setStep] = useState<number>(4)
+    const reset = useAuthStore((state) => state.reset)
 
-export const SignIn = () => {
+    /**
+     * @function handleEmailStart
+     * @description 이메일 시작 버튼 클릭 시 이벤트
+     */
+    const handleEmailStart = useCallback(() => {
+        setStep(1)
+    }, [])
+
+    /**
+     * @function handlePrev
+     * @description 이전 버튼 클릭 시 이벤트
+     */
+    const handlePrev = useCallback(() => {
+        setStep(step - 1)
+    }, [step])
+
+    /**
+     * @function handleNext
+     * @description 다음 버튼 클릭 시 이벤트
+     */
+    const handleNext = useCallback(() => {
+        setStep(step + 1)
+    }, [step])
+
+    useEffect(() => {
+        if (!isModalOpen) {
+            setStep(4)
+            reset()
+        }
+    }, [isModalOpen])
+
     return (
-        <Layout className={accountStyles.container}>
-            <Content className={accountStyles.content}>
-                <Flex justify="center" align="center">
-                    <img src={LogoText} alt="logo" className={accountStyles.logo} />
-                </Flex>
-                <Flex vertical gap={10}>
-                    <Typography.Title level={4}>시작하기</Typography.Title>
-                    <Button className={accountStyles.kakaoButton} type="primary">
-                        <img src={Kakao} alt="kakao" className={accountStyles.kakaoIcon} />
-                        <Typography.Text className="!text-[16px]">카카오톡 로그인</Typography.Text>
+        <Modal className="!w-[420px]" title="" footer={<></>} open={isModalOpen} onCancel={handleCancel}>
+            {step === 0 && <StartType handleEmail={handleEmailStart} />}
+            {step === 1 && <StepEmail handlePrev={handlePrev} handleNext={handleNext} />}
+            {step === 2 && <StepAuthCode handlePrev={handlePrev} handleNext={handleNext} />}
+            {step === 3 && <StepRegUser handlePrev={handlePrev} handleNext={handleNext} />}
+            {step === 4 && <StepAgree handlePrev={handlePrev} handleNext={handleNext} />}
+            {/* {step > 0 && (
+                <Flex justify="space-between" className="!mt-10" gap={10}>
+                    <Button onClick={handlePrev} className={accountStyles.buttonSize}>
+                        <Typography.Text>이전</Typography.Text>
                     </Button>
-                    <Button className={accountStyles.naverButton} type="primary">
-                        <img src={Naver} alt="naver" className={accountStyles.naverIcon} />
-                        <Typography.Text className={accountStyles.btnText}>네이버 로그인</Typography.Text>
-                    </Button>
-                    <Button className={accountStyles.emailButton} type="primary">
-                        <MailOutlined className={accountStyles.btnIcon} />
-                        <Typography.Text className={accountStyles.btnText}>이메일로 시작하기</Typography.Text>
+                    <Button type="primary" onClick={handleNext} className={accountStyles.buttonSize}>
+                        <Typography.Text className="!text-white">다음</Typography.Text>
                     </Button>
                 </Flex>
-            </Content>
-        </Layout>
+            )} */}
+        </Modal>
     )
 }
