@@ -15,7 +15,7 @@
 -   Ant Design
 -   Tailwind CSS
 -   React Query
--   Recoil
+-   Zustand
 -   Axios
 
 ## BACKEND
