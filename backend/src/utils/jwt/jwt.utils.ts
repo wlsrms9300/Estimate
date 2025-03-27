@@ -32,11 +32,11 @@ export const jwtUtils = {
             throw new Error('토큰 생성 중 오류가 발생했습니다.')
         }
     },
-
+    // 토큰 검증
     verifyToken(token: string) {
         try {
             const decoded = jwt.verify(token, jwtConfig.secretKey) as jwt.JwtPayload
-
+            console.log('decoded', decoded)
             // 토큰 만료 시간 확인
             const currentTime = Math.floor(Date.now() / 1000)
             if (decoded.exp && decoded.exp < currentTime) {

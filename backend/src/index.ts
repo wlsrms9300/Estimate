@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import dataRoutes from './routes/data.routes'
+import memberRoutes from './routes/member.routes'
 import { errorHandler } from './middleware/error.middleware'
 
 dotenv.config()
@@ -16,8 +16,10 @@ app.use(
 )
 
 app.use(express.json())
-app.get('/', function (req, res) { res.send('테스트입니다.'); });
-app.use('/api', dataRoutes)
+app.get('/', function (req, res) {
+    res.send('테스트입니다.')
+})
+app.use('/member', memberRoutes)
 app.use(errorHandler)
 
 app.listen(port, () => {
