@@ -28,15 +28,7 @@ export default function StepCertNo({ handlePrev, handleNext }: StepCertNoProps) 
     const email = useAuthStore((state) => state.email)
     const setCertNo = useAuthStore((state) => state.setCertNo)
 
-    const mutateCertNo = useVerifyCertNo(
-        (response) => {
-            console.log('Verification successful:', response)
-            handleNext()
-        },
-        (error) => {
-            console.error('Error verifying auth code:', error)
-        },
-    )
+    const mutateCertNo = useVerifyCertNo(handleNext)
 
     /**
      * @function onSubmit

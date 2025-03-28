@@ -32,15 +32,7 @@ export default function StepAgree({ handlePrev, handleNext }: StepAgreeProps) {
 
     const isSubmitDisabled = !agreeTermsOfAge || !agreeTermsOfUse || !agreeTermsOfPersonal
 
-    const mutateSignup = useSignup(
-        (response) => {
-            console.log('response', response)
-            handleNext()
-        },
-        (error) => {
-            console.error('Error sending email:', error)
-        },
-    )
+    const mutateSignup = useSignup(handleNext)
 
     const onSubmit = () => {
         mutateSignup.mutate({

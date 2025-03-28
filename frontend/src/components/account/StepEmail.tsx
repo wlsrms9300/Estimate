@@ -14,7 +14,7 @@ interface EmailForm {
 }
 
 export default function StepEmail({ handlePrev, handleNext }: StepEmailProps) {
-    const { notification } = App.useApp()
+    // const { notification } = App.useApp()
     const {
         control,
         handleSubmit,
@@ -30,27 +30,7 @@ export default function StepEmail({ handlePrev, handleNext }: StepEmailProps) {
     const email = watch('email')
     const setEmail = useAuthStore((state) => state.setEmail)
 
-    const mutateEmail = useSendVerificationCode(
-        (response) => {
-            console.log('response', response)
-            notification.info({
-                message: '이메일 인증 코드가 발송되었습니다.',
-                description: '이메일을 확인해주세요.',
-                placement: 'bottomRight',
-                duration: 5,
-            })
-            handleNext()
-        },
-        (error) => {
-            console.error('Error sending email:', error)
-            notification.error({
-                message: '이메일 인증 코드 발송 실패',
-                description: '이메일을 확인해주세요.',
-                placement: 'bottomRight',
-                duration: 5,
-            })
-        },
-    )
+    const mutateEmail = useSendVerificationCode(handleNext)
 
     /**
      * @function onSubmit

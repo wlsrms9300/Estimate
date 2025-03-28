@@ -6,14 +6,15 @@ import { sendVerificationCode, verifyCertNo, signup } from '../../services/accou
  * @post /member/emailCertSend
  * @description 이메일 인증 코드 전송
  */
-export const useSendVerificationCode = (onSuccess: (response: any) => void, onError: (error: any) => void) => {
+export const useSendVerificationCode = (onSuccess: () => void) => {
     return useMutation({
         mutationFn: sendVerificationCode,
         onSuccess: (response) => {
-            onSuccess(response)
+            console.log('response', response)
+            onSuccess()
         },
         onError: (error) => {
-            onError(error)
+            console.error('Error sending email:', error)
         },
     })
 }
@@ -23,14 +24,15 @@ export const useSendVerificationCode = (onSuccess: (response: any) => void, onEr
  * @post /member/emailCertCheck
  * @description 이메일 인증 코드 확인
  */
-export const useVerifyCertNo = (onSuccess: (response: any) => void, onError: (error: any) => void) => {
+export const useVerifyCertNo = (onSuccess: () => void) => {
     return useMutation({
         mutationFn: verifyCertNo,
         onSuccess: (response) => {
-            onSuccess(response)
+            console.log('response', response)
+            onSuccess()
         },
         onError: (error) => {
-            onError(error)
+            console.error('Error verifying auth code:', error)
         },
     })
 }
@@ -40,14 +42,15 @@ export const useVerifyCertNo = (onSuccess: (response: any) => void, onError: (er
  * @post /member/signup
  * @description 회원가입
  */
-export const useSignup = (onSuccess: (response: any) => void, onError: (error: any) => void) => {
+export const useSignup = (onSuccess: () => void) => {
     return useMutation({
         mutationFn: signup,
         onSuccess: (response) => {
-            onSuccess(response)
+            console.log('response', response)
+            onSuccess()
         },
         onError: (error) => {
-            onError(error)
+            console.error('Error signing up:', error)
         },
     })
 }
