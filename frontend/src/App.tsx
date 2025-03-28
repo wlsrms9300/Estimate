@@ -3,7 +3,7 @@ import './assets/css/index.css'
 import { theme } from './styles/theme'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ConfigProvider } from 'antd'
+import { ConfigProvider, App } from 'antd'
 
 // pages
 import Introduce from './pages/Introduce'
@@ -19,21 +19,25 @@ const queryClient = new QueryClient({
     },
 })
 
-function App() {
+function MyApp() {
+    // const { message, modal, notification } = App.useApp()
+
     return (
         <QueryClientProvider client={queryClient}>
             <ConfigProvider theme={theme}>
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="/" element={<Introduce />} />
-                        <Route path="/so" element={<MainLayout />}>
-                            <Route path="estimate" element={<EstimateMenu />} />
-                        </Route>
-                    </Routes>
-                </BrowserRouter>
+                <App>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="/" element={<Introduce />} />
+                            <Route path="/so" element={<MainLayout />}>
+                                <Route path="estimate" element={<EstimateMenu />} />
+                            </Route>
+                        </Routes>
+                    </BrowserRouter>
+                </App>
             </ConfigProvider>
         </QueryClientProvider>
     )
 }
 
-export default App
+export default MyApp

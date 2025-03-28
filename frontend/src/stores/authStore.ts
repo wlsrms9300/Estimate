@@ -2,14 +2,14 @@ import { create } from 'zustand'
 
 interface AuthState {
     email: string
-    authCode: string
+    certNo: string
     password: string
     agreeTermsOfAge: boolean // 만 14세 이상 동의
     agreeTermsOfUse: boolean // 이용약관 동의
     agreeTermsOfPersonal: boolean // 개인정보 수집 및 이용 동의
     agreeTermsOfMarketing: boolean // 마케팅 동의
     setEmail: (email: string) => void
-    setAuthCode: (authCode: string) => void
+    setCertNo: (certNo: string) => void
     setPassword: (password: string) => void
     setAgreeTermsOfAge: (agreeTermsOfAge: boolean) => void
     setAgreeTermsOfUse: (agreeTermsOfUse: boolean) => void
@@ -20,7 +20,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => ({
     email: '',
-    authCode: '',
+    certNo: '',
     password: '',
     name: '',
     agreeTermsOfAge: false,
@@ -28,7 +28,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     agreeTermsOfPersonal: false,
     agreeTermsOfMarketing: false,
     setEmail: (email) => set({ email }),
-    setAuthCode: (authCode) => set({ authCode }),
+    setCertNo: (certNo) => set({ certNo }),
     setPassword: (password) => set({ password }),
     setAgreeTermsOfAge: (agreeTermsOfAge) => set({ agreeTermsOfAge }),
     setAgreeTermsOfUse: (agreeTermsOfUse) => set({ agreeTermsOfUse }),
@@ -37,7 +37,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     reset: () =>
         set({
             email: '',
-            authCode: '',
+            certNo: '',
             password: '',
             agreeTermsOfAge: false,
             agreeTermsOfUse: false,

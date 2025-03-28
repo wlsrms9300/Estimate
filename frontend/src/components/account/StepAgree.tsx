@@ -1,7 +1,8 @@
 import { Flex, Layout, Typography, Checkbox, Button, Form } from 'antd'
 import { useAuthStore } from '../../stores/authStore'
 import { accountStyles } from '../../styles/account.styles'
-
+import { RightOutlined } from '@ant-design/icons'
+import { useSignup } from '../../hooks/account/authService'
 interface StepAgreeProps {
     handlePrev: () => void
     handleNext: () => void
@@ -19,6 +20,8 @@ export default function StepAgree({ handlePrev, handleNext }: StepAgreeProps) {
         setAgreeTermsOfMarketing,
     } = useAuthStore((state) => state)
 
+    const { email, password } = useAuthStore((state) => state)
+
     const handleAllAgreeChange = (e: any) => {
         const checked = e.target.checked
         setAgreeTermsOfAge(checked)
@@ -27,7 +30,28 @@ export default function StepAgree({ handlePrev, handleNext }: StepAgreeProps) {
         setAgreeTermsOfMarketing(checked)
     }
 
-    const isSubmitDisabled = !agreeTermsOfAge || !agreeTermsOfUse || !agreeTermsOfPersonal || !agreeTermsOfMarketing
+    const isSubmitDisabled = !agreeTermsOfAge || !agreeTermsOfUse || !agreeTermsOfPersonal
+
+    const mutateSignup = useSignup(
+        (response) => {
+            console.log('response', response)
+            handleNext()
+        },
+        (error) => {
+            console.error('Error sending email:', error)
+        },
+    )
+
+    const onSubmit = () => {
+        mutateSignup.mutate({
+            agreeTermsOfAge,
+            agreeTermsOfUse,
+            agreeTermsOfPersonal,
+            agreeTermsOfMarketing,
+            userId: email,
+            password,
+        })
+    }
 
     return (
         <Layout className={accountStyles.stepContainer}>
@@ -36,37 +60,46 @@ export default function StepAgree({ handlePrev, handleNext }: StepAgreeProps) {
                     <Typography.Title level={3}>약관 동의</Typography.Title>
                 </div>
 
-                <Form layout="vertical">
+                <Form layout="vertical" onFinish={onSubmit}>
                     <Form.Item>
                         <Checkbox
                             checked={agreeTermsOfAge && agreeTermsOfUse && agreeTermsOfPersonal && agreeTermsOfMarketing}
                             onChange={handleAllAgreeChange}>
-                            모두 동의합니다
+                            아래의 모든 내용에 동의합니다
                         </Checkbox>
                     </Form.Item>
 
                     <Form.Item>
                         <Checkbox checked={agreeTermsOfAge} onChange={(e) => setAgreeTermsOfAge(e.target.checked)}>
-                            만 14세 이상입니다.
+                            (필수) 만 14세 이상입니다.
                         </Checkbox>
                     </Form.Item>
 
                     <Form.Item>
-                        <Checkbox checked={agreeTermsOfUse} onChange={(e) => setAgreeTermsOfUse(e.target.checked)}>
-                            이용약관에 동의합니다.
-                        </Checkbox>
+                        <Flex justify="space-between" align="center">
+                            <Checkbox checked={agreeTermsOfUse} onChange={(e) => setAgreeTermsOfUse(e.target.checked)}>
+                                (필수) 이용약관에 동의합니다.
+                            </Checkbox>
+                            <RightOutlined className={accountStyles.arrowIcon} />
+                        </Flex>
                     </Form.Item>
 
                     <Form.Item>
-                        <Checkbox checked={agreeTermsOfPersonal} onChange={(e) => setAgreeTermsOfPersonal(e.target.checked)}>
-                            개인정보 수집 및 이용에 동의합니다.
-                        </Checkbox>
+                        <Flex justify="space-between" align="center">
+                            <Checkbox checked={agreeTermsOfPersonal} onChange={(e) => setAgreeTermsOfPersonal(e.target.checked)}>
+                                (필수) 개인정보 수집 및 이용에 동의합니다.
+                            </Checkbox>
+                            <RightOutlined className={accountStyles.arrowIcon} />
+                        </Flex>
                     </Form.Item>
 
                     <Form.Item>
-                        <Checkbox checked={agreeTermsOfMarketing} onChange={(e) => setAgreeTermsOfMarketing(e.target.checked)}>
-                            마케팅 정보 수신에 동의합니다.
-                        </Checkbox>
+                        <Flex justify="space-between" align="center">
+                            <Checkbox checked={agreeTermsOfMarketing} onChange={(e) => setAgreeTermsOfMarketing(e.target.checked)}>
+                                (선택) 마케팅 정보 수신에 동의합니다.
+                            </Checkbox>
+                            <RightOutlined className={accountStyles.arrowIcon} />
+                        </Flex>
                     </Form.Item>
 
                     <Form.Item>
@@ -74,12 +107,7 @@ export default function StepAgree({ handlePrev, handleNext }: StepAgreeProps) {
                             <Button className={accountStyles.buttonSize} onClick={handlePrev}>
                                 <Typography.Text>이전</Typography.Text>
                             </Button>
-                            <Button
-                                type="primary"
-                                htmlType="submit"
-                                className={accountStyles.buttonSize}
-                                disabled={isSubmitDisabled}
-                                onClick={handleNext}>
+                            <Button type="primary" htmlType="submit" className={accountStyles.buttonSize} disabled={isSubmitDisabled}>
                                 완료
                             </Button>
                         </Flex>

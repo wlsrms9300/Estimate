@@ -1,43 +1,50 @@
-// components/account/StepEmail.tsx
+// components/account/StepAuthCode.tsx
 import React from 'react'
 import { Flex, Layout, Typography, Input, Button, Form } from 'antd'
 import { useForm, Controller } from 'react-hook-form'
 import { useAuthStore } from '../../stores/authStore'
 import { accountStyles } from '../../styles/account.styles'
-import { validateAuthCode, validationPatterns } from '../../utils/validation'
+import { validationPatterns } from '../../utils/validation'
+import { useVerifyCertNo } from '../../hooks/account/authService'
 
-interface StepAuthCodeProps {
+interface StepCertNoProps {
     handlePrev: () => void
     handleNext: () => void
 }
 
-interface AuthCodeForm {
-    authCode: string
+interface CertNoForm {
+    certNo: string
 }
 
-export default function StepAuthCode({ handlePrev, handleNext }: StepAuthCodeProps) {
-    const {
-        control,
-        handleSubmit,
-        formState: { errors },
-        watch,
-    } = useForm<AuthCodeForm>({
+export default function StepCertNo({ handlePrev, handleNext }: StepCertNoProps) {
+    const { control, handleSubmit, watch } = useForm<CertNoForm>({
         defaultValues: {
-            authCode: '',
+            certNo: '',
         },
         mode: 'onChange',
     })
 
-    const authCode = watch('authCode')
-    const setAuthCode = useAuthStore((state) => state.setAuthCode)
+    const certNo = watch('certNo')
+    const email = useAuthStore((state) => state.email)
+    const setCertNo = useAuthStore((state) => state.setCertNo)
+
+    const mutateCertNo = useVerifyCertNo(
+        (response) => {
+            console.log('Verification successful:', response)
+            handleNext()
+        },
+        (error) => {
+            console.error('Error verifying auth code:', error)
+        },
+    )
 
     /**
      * @function onSubmit
      * @description form submit 함수
      */
-    const onSubmit = (data: AuthCodeForm) => {
-        setAuthCode(data.authCode)
-        handleNext()
+    const onSubmit = (data: CertNoForm) => {
+        setCertNo(data.certNo)
+        mutateCertNo.mutate({ email: email, certNo: data.certNo })
     }
 
     return (
@@ -49,22 +56,22 @@ export default function StepAuthCode({ handlePrev, handleNext }: StepAuthCodePro
 
                 <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
                     <Controller
-                        name="authCode"
+                        name="certNo"
                         control={control}
                         rules={{
                             required: '인증코드를 입력해주세요',
                             pattern: {
-                                value: validationPatterns.authCode,
+                                value: validationPatterns.certNo,
                                 message: '6자리 숫자를 입력해주세요.',
                             },
                         }}
                         render={({ field }) => (
                             <Form.Item
                                 label="인증코드"
-                                validateStatus={authCode ? (validateAuthCode(authCode) ? 'success' : 'error') : ''}
+                                validateStatus={certNo ? (validationPatterns.certNo.test(certNo) ? 'success' : 'error') : ''}
                                 help={
-                                    authCode ? (
-                                        validateAuthCode(authCode) ? (
+                                    certNo ? (
+                                        validationPatterns.certNo.test(certNo) ? (
                                             ''
                                         ) : (
                                             <Typography.Text className="!text-red-500 ml-2.5 !text-[12px]">6자리 숫자를 입력해주세요</Typography.Text>
@@ -73,21 +80,33 @@ export default function StepAuthCode({ handlePrev, handleNext }: StepAuthCodePro
                                         ''
                                     )
                                 }>
-                                <Input {...field} size="large" placeholder="6자리 인증코드 입력" className="!rounded-xl" allowClear maxLength={6} />
+                                <Input
+                                    {...field}
+                                    size="large"
+                                    placeholder="6자리 인증코드를 입력하세요"
+                                    className="!rounded-xl"
+                                    allowClear
+                                    maxLength={6}
+                                />
                             </Form.Item>
                         )}
                     />
+                    <Form.Item>
+                        <Flex justify="space-between" className="!mt-10" gap={10}>
+                            <Button className={accountStyles.buttonSize} onClick={handlePrev}>
+                                <Typography.Text>이전</Typography.Text>
+                            </Button>
+                            <Button
+                                loading={mutateCertNo.isPending}
+                                type="primary"
+                                htmlType="submit"
+                                className={accountStyles.buttonSize}
+                                disabled={!validationPatterns.certNo.test(certNo)}>
+                                인증코드 확인
+                            </Button>
+                        </Flex>
+                    </Form.Item>
                 </Form>
-                <Form.Item>
-                    <Flex justify="space-between" className="!mt-10" gap={10}>
-                        <Button className={accountStyles.buttonSize} onClick={handlePrev}>
-                            <Typography.Text>이전</Typography.Text>
-                        </Button>
-                        <Button type="primary" htmlType="submit" className={accountStyles.buttonSize} disabled={!validateAuthCode(authCode)}>
-                            인증코드 확인
-                        </Button>
-                    </Flex>
-                </Form.Item>
             </Flex>
         </Layout>
     )

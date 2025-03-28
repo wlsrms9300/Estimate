@@ -1,4 +1,4 @@
-import { Flex, Layout, Typography, Input, Button, Form } from 'antd'
+import { Flex, Layout, Typography, Input, Button, Form, App } from 'antd'
 import { useForm, Controller } from 'react-hook-form'
 import { useAuthStore } from '../../stores/authStore'
 import { accountStyles } from '../../styles/account.styles'
@@ -14,6 +14,7 @@ interface EmailForm {
 }
 
 export default function StepEmail({ handlePrev, handleNext }: StepEmailProps) {
+    const { notification } = App.useApp()
     const {
         control,
         handleSubmit,
@@ -30,11 +31,24 @@ export default function StepEmail({ handlePrev, handleNext }: StepEmailProps) {
     const setEmail = useAuthStore((state) => state.setEmail)
 
     const mutateEmail = useSendVerificationCode(
-        () => {
+        (response) => {
+            console.log('response', response)
+            notification.info({
+                message: '이메일 인증 코드가 발송되었습니다.',
+                description: '이메일을 확인해주세요.',
+                placement: 'bottomRight',
+                duration: 5,
+            })
             handleNext()
         },
         (error) => {
             console.error('Error sending email:', error)
+            notification.error({
+                message: '이메일 인증 코드 발송 실패',
+                description: '이메일을 확인해주세요.',
+                placement: 'bottomRight',
+                duration: 5,
+            })
         },
     )
 
@@ -91,7 +105,12 @@ export default function StepEmail({ handlePrev, handleNext }: StepEmailProps) {
                             <Button className={accountStyles.buttonSize} onClick={handlePrev}>
                                 <Typography.Text>이전</Typography.Text>
                             </Button>
-                            <Button type="primary" htmlType="submit" className={accountStyles.buttonSize} disabled={!validateEmail(email)}>
+                            <Button
+                                loading={mutateEmail.isPending}
+                                type="primary"
+                                htmlType="submit"
+                                className={accountStyles.buttonSize}
+                                disabled={!validateEmail(email)}>
                                 이메일 인증
                             </Button>
                         </Flex>

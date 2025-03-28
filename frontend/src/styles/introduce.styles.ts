@@ -4,7 +4,7 @@ export const introduceStyles = {
     headerContent: 'max-w-7xl mx-auto px-6 py-4 flex items-center justify-between',
     logo: 'text-2xl font-bold text-white',
     nav: 'flex items-center gap-x-10',
-    navLink: 'text-white hover:text-gray-200 cursor-pointer whitespace-nowrap',
+    navLink: '!text-white hover:!text-gray-200 cursor-pointer !whitespace-nowrap',
     primaryButton: '!rounded-sl !bg-white !text-[#00c4cc] !border-none hover:!shadow-lg !transition-all !duration-300 !whitespace-nowrap',
     heroSection: 'pt-32 pb-20 px-6',
     heroContent: 'max-w-7xl mx-auto flex items-center',

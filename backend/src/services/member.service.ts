@@ -32,8 +32,15 @@ export const memberService = {
 
     //회원가입
     async signup(tableName: string, memberData: any) {
+        let data = { ...memberData }
+
+        data.agreeTermsOfPersonalCollection = memberData.agreeTermsOfPersonal || false
+        data.agreeTermsOfPersonalUse = memberData.agreeTermsOfPersonal || false
+
+        delete data.agreeTermsOfPersonal
+
         try {
-            const { data: result, error } = await supabase.from(tableName).insert(transformData.toSnakeCase(memberData)).select()
+            const { data: result, error } = await supabase.from(tableName).insert(transformData.toSnakeCase(data)).select()
 
             if (error) {
                 // PostgreSQL unique violation 에러 코드: 23505

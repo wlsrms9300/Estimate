@@ -13,4 +13,6 @@ export const accountStyles = {
 
     // StepEmail
     stepContainer: '!bg-white !flex !flex-col !justify-between !pt-20',
+    // StepAgree
+    arrowIcon: '!text-[#6366f1] cursor-pointer text-[12px]',
 }

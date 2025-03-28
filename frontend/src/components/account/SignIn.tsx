@@ -1,10 +1,9 @@
 import { useState, useCallback, useEffect } from 'react'
-import { Flex, Typography, Button, Modal } from 'antd'
-import { accountStyles } from '../../styles/account.styles'
+import { Modal } from 'antd'
 // components
 import StepEmail from './StepEmail'
 import StepAuthCode from './StepAuthCode'
-import StepRegUser from './StepRegUser'
+import StepPassword from './StepPassword'
 import StepAgree from './StepAgree'
 import StartType from './StartType'
 import { useAuthStore } from '../../stores/authStore'
@@ -14,7 +13,7 @@ interface SignInProps {
 }
 
 export const SignIn = ({ isModalOpen, handleCancel }: SignInProps) => {
-    const [step, setStep] = useState<number>(4)
+    const [step, setStep] = useState<number>(0)
     const reset = useAuthStore((state) => state.reset)
 
     /**
@@ -30,7 +29,12 @@ export const SignIn = ({ isModalOpen, handleCancel }: SignInProps) => {
      * @description 이전 버튼 클릭 시 이벤트
      */
     const handlePrev = useCallback(() => {
-        setStep(step - 1)
+        if (step === 3) {
+            // 이메일 인증 후 뒤로가기 시 인증번호 발송부터 다시 시작
+            setStep(1)
+        } else {
+            setStep(step - 1)
+        }
     }, [step])
 
     /**
@@ -43,7 +47,7 @@ export const SignIn = ({ isModalOpen, handleCancel }: SignInProps) => {
 
     useEffect(() => {
         if (!isModalOpen) {
-            setStep(4)
+            setStep(0)
             reset()
         }
     }, [isModalOpen])
@@ -53,18 +57,8 @@ export const SignIn = ({ isModalOpen, handleCancel }: SignInProps) => {
             {step === 0 && <StartType handleEmail={handleEmailStart} />}
             {step === 1 && <StepEmail handlePrev={handlePrev} handleNext={handleNext} />}
             {step === 2 && <StepAuthCode handlePrev={handlePrev} handleNext={handleNext} />}
-            {step === 3 && <StepRegUser handlePrev={handlePrev} handleNext={handleNext} />}
-            {step === 4 && <StepAgree handlePrev={handlePrev} handleNext={handleNext} />}
-            {/* {step > 0 && (
-                <Flex justify="space-between" className="!mt-10" gap={10}>
-                    <Button onClick={handlePrev} className={accountStyles.buttonSize}>
-                        <Typography.Text>이전</Typography.Text>
-                    </Button>
-                    <Button type="primary" onClick={handleNext} className={accountStyles.buttonSize}>
-                        <Typography.Text className="!text-white">다음</Typography.Text>
-                    </Button>
-                </Flex>
-            )} */}
+            {step === 3 && <StepPassword handlePrev={handlePrev} handleNext={handleNext} />}
+            {step === 4 && <StepAgree handlePrev={handlePrev} handleNext={handleCancel} />}
         </Modal>
     )
 }

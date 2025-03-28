@@ -34,3 +34,11 @@
 ## API 문서
 
 -   Apidog
+
+## 규칙
+
+-   Backend
+
+    -   API Success Response status GET:200, POST/DELETE:201
+
+-   Frontend

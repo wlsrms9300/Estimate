@@ -4,7 +4,7 @@ import { useAuthStore } from '../../stores/authStore'
 import { accountStyles } from '../../styles/account.styles'
 import { validationPatterns, validatePassword } from '../../utils/validation'
 
-interface StepRegUserProps {
+interface StepPasswordProps {
     handlePrev: () => void
     handleNext: () => void
 }
@@ -14,7 +14,7 @@ interface PasswordForm {
     passwordCheck: string
 }
 
-export default function StepRegUser({ handlePrev, handleNext }: StepRegUserProps) {
+export default function StepPassword({ handlePrev, handleNext }: StepPasswordProps) {
     const { control, handleSubmit, watch } = useForm<PasswordForm>({
         defaultValues: {
             password: '',
