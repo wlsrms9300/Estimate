@@ -39,51 +39,48 @@ export const memberService = {
                 // PostgreSQL unique violation 에러 코드: 23505
                 if (error.code === '23505') {
                     return {
-                        success: false,
-                        message: '이미 사용 중인 아이디입니다.',
-                        error: error.message,
+                        resultCd: '100', // DB 관련 오류 코드
+                        resultMsg: '이미 사용 중인 아이디입니다.' + '[' + error.message + ']',
                     }
                 }
-                throw error
+                return {
+                    resultCd: '100', // DB 관련 오류 코드
+                    resultMsg: '데이터베이스 오류가 발생했습니다.' + '[' + error.message + ']',
+                }
             }
 
             return {
-                success: true,
+                resultCd: '000', // 성공 코드
                 data: transformData.toCamelCase(result),
-                message: '회원가입이 완료되었습니다.',
+                resultMsg: '회원가입이 완료되었습니다.',
             }
         } catch (error) {
             console.error('회원가입 에러:', error)
-            throw error
+            return {
+                resultCd: '500', // 서버 오류 코드
+                resultMsg: '회원가입 처리 중 오류가 발생했습니다.',
+            }
         }
-    },
-
-    async updateData(tableName: string, id: number, data: any) {
-        const { data: result, error } = await supabase.from(tableName).update(data).eq('id', id).select()
-        if (error) throw error
-        return result
-    },
-
-    async deleteData(tableName: string, id: number) {
-        const { error } = await supabase.from(tableName).delete().eq('id', id)
-        if (error) throw error
-        return true
     },
 
     //로그인
     async login(memberData: any) {
-        const { data, error } = await supabase
-            .from('EM_MEMBER')
-            .select('*')
-            .eq('user_id', memberData.userId)
-            .eq('password', memberData.password) // 실제 구현시에는 반드시 비밀번호 해시화 비교 로직 필요
-            .single()
+        const { userId, password } = memberData // userId와 password를 분리
+        const { data, error } = await supabase.from('EM_MEMBER').select('*').eq('user_id', userId).single() // single()을 사용하여 단일 사용자만 가져옴
 
-        if (error) {
-            throw new Error('로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.')
+        if (error || !data) {
+            return {
+                resultCd: '400', // 인증 오류 코드
+                resultMsg: '로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.',
+            }
         }
-        if (!data) {
-            throw new Error('사용자를 찾을 수 없습니다.')
+
+        // 비밀번호 비교 (암호화하지 않고 직접 비교)
+        if (data.password !== password) {
+            return {
+                resultCd: '400', // 인증 오류 코드
+                resultMsg: '로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.',
+            }
         }
 
         // 토큰 페이로드 생성
@@ -98,6 +95,7 @@ export const memberService = {
         await this.updateUserLoginInfo(data.user_id, refreshToken)
 
         return {
+            resultCd: '000', // 성공 코드
             user: transformData.toCamelCase(data),
             accessToken,
             refreshToken,
@@ -155,9 +153,9 @@ export const memberService = {
             // 이미 등록된 사용자가 있는 경우
             if (existingUser) {
                 return {
-                    success: false,
-                    message: '이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요.',
-                    data: existingUser,
+                    resultCd: '400',
+                    resultMsg: '이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요.',
+                    data: transformData.toCamelCase(existingUser),
                 }
             }
 
@@ -179,7 +177,12 @@ export const memberService = {
                 },
             )
 
-            if (certError) throw new Error('인증번호 저장 중 오류가 발생했습니다.' + certError.message)
+            if (certError) {
+                return {
+                    resultCd: '100', // DB 관련 오류 코드
+                    resultMsg: '인증번호 저장 중 오류가 발생했습니다.' + '[' + certError.message + ']',
+                }
+            }
 
             // 이메일 발송
             const mailOptions = {
@@ -197,16 +200,18 @@ export const memberService = {
             await transporter.sendMail(mailOptions)
 
             return {
-                success: true,
-                message: '인증번호가 이메일로 발송되었습니다.',
+                resultCd: '000',
+                resultMsg: '인증번호가 이메일로 발송되었습니다.',
                 data: {
                     userId: userId,
                     certNo: certNo,
                 },
             }
         } catch (error) {
-            console.error('이메일 인증번호 발송 중 오류:', error)
-            throw error
+            return {
+                resultCd: '500', // 서버 오류 코드
+                resultMsg: '이메일 인증번호 발송 중 오류가 발생했습니다.' + '[' + error + ']',
+            }
         }
     },
 
@@ -223,15 +228,15 @@ export const memberService = {
 
             if (!certData) {
                 return {
-                    success: false,
-                    message: '인증번호가 존재하지 않습니다.',
+                    resultCd: '400',
+                    resultMsg: '인증번호가 존재하지 않습니다.',
                 }
             }
 
             if (certData.cert_yn === 'Y') {
                 return {
-                    success: false,
-                    message: '이미 인증된 이메일입니다.',
+                    resultCd: '400', // 사용자 입력 오류 코드
+                    resultMsg: '이미 인증된 이메일입니다.',
                 }
             }
 
@@ -240,18 +245,23 @@ export const memberService = {
 
             if (certData.expires_at < currentTimestamp) {
                 return {
-                    success: false,
-                    message: '인증번호가 만료되었습니다.',
+                    resultCd: '400', // 사용자 입력 오류 코드
+                    resultMsg: '인증번호가 만료되었습니다.',
                 }
             }
 
             // 인증번호 업데이트
             const { error: updateError } = await supabase.from('EM_EMAIL_CERT').update({ cert_yn: 'Y' }).eq('user_id', userId)
-            if (updateError) throw new Error('인증번호 업데이트 중 오류가 발생했습니다.' + updateError.message)
+            if (updateError) {
+                return {
+                    resultCd: '100', // DB 관련 오류 코드
+                    resultMsg: '인증번호 업데이트 중 오류가 발생했습니다.',
+                }
+            }
 
             return {
-                success: true,
-                message: '인증번호가 확인되었습니다.',
+                resultCd: '000', // 성공 코드
+                resultMsg: '인증번호가 확인되었습니다.',
                 data: {
                     userId: certData.user_id,
                     certNo: certData.cert_no,
@@ -260,8 +270,10 @@ export const memberService = {
                 },
             }
         } catch (error) {
-            console.error('이메일 인증번호 인증 중 오류:', error)
-            throw error
+            return {
+                resultCd: '500', // 서버 오류 코드
+                resultMsg: '이메일 인증번호 인증 중 오류가 발생했습니다.' + '[' + error + ']',
+            }
         }
     },
 }

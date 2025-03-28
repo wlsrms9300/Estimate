@@ -21,7 +21,7 @@ export const memberController = {
         try {
             const result = await memberService.signup('EM_MEMBER', req.body)
 
-            if (!result.success) {
+            if (result.resultCd !== '000') {
                 return res.status(400).json(result)
             }
 
@@ -42,7 +42,7 @@ export const memberController = {
             const result = await memberService.login({ userId, password })
 
             res.json({
-                success: true,
+                resultCd: '000',
                 data: {
                     user: result.user,
                     accessToken: result.accessToken,
@@ -50,8 +50,8 @@ export const memberController = {
             })
         } catch (error: any) {
             res.status(401).json({
-                success: false,
-                error: error.message || '로그인 중 오류가 발생했습니다.',
+                resultCd: '100',
+                resultMsg: '로그인 중 오류가 발생했습니다.' + '[' + error.message + ']',
             })
         }
     },
