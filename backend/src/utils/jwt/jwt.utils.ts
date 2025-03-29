@@ -20,6 +20,7 @@ export const jwtUtils = {
             const refreshToken = jwt.sign(
                 {
                     userId: payload.userId,
+                    password: payload.password,
                     tokenType: 'refresh',
                     expiresIn: jwtConfig.refreshExpiresIn,
                 },

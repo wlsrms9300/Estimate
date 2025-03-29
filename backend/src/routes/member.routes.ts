@@ -12,4 +12,7 @@ router.post('/login', memberController.login as RequestHandler)
 router.post('/emailCertSend', memberController.emailCertSend as RequestHandler)
 router.post('/emailCertCheck', memberController.emailCertCheck as RequestHandler)
 
+// 리프레시 토큰을 이용한 재발급
+router.post('/refreshToken', memberController.refreshToken as RequestHandler)
+
 export default router

@@ -46,20 +46,20 @@ export const memberService = {
                 // PostgreSQL unique violation 에러 코드: 23505
                 if (error.code === '23505') {
                     return {
-                        resultCd: '100', // DB 관련 오류 코드
+                        resultCd: '400', // 클라이언트 에러 코드
                         resultMsg: '이미 사용 중인 아이디입니다.' + '[' + error.message + ']',
                     }
                 }
                 return {
-                    resultCd: '100', // DB 관련 오류 코드
+                    resultCd: '400', // 클라이언트 에러 코드
                     resultMsg: '데이터베이스 오류가 발생했습니다.' + '[' + error.message + ']',
                 }
             }
 
             return {
-                resultCd: '000', // 성공 코드
-                data: transformData.toCamelCase(result),
+                resultCd: '201', // 성공 코드
                 resultMsg: '회원가입이 완료되었습니다.',
+                data: transformData.toCamelCase(result),
             }
         } catch (error) {
             console.error('회원가입 에러:', error)
@@ -77,7 +77,7 @@ export const memberService = {
 
         if (error || !data) {
             return {
-                resultCd: '400', // 인증 오류 코드
+                resultCd: '400', // 클라이언트 에러 코드
                 resultMsg: '로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.',
             }
         }
@@ -85,7 +85,7 @@ export const memberService = {
         // 비밀번호 비교 (암호화하지 않고 직접 비교)
         if (data.password !== password) {
             return {
-                resultCd: '400', // 인증 오류 코드
+                resultCd: '400', // 클라이언트 에러 코드
                 resultMsg: '로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.',
             }
         }
@@ -102,7 +102,7 @@ export const memberService = {
         await this.updateUserLoginInfo(data.user_id, refreshToken)
 
         return {
-            resultCd: '000', // 성공 코드
+            resultCd: '201', // 성공 코드
             user: transformData.toCamelCase(data),
             accessToken,
             refreshToken,
@@ -207,7 +207,7 @@ export const memberService = {
             await transporter.sendMail(mailOptions)
 
             return {
-                resultCd: '000',
+                resultCd: '201',
                 resultMsg: '인증번호가 이메일로 발송되었습니다.',
                 data: {
                     userId: userId,
@@ -235,14 +235,14 @@ export const memberService = {
 
             if (!certData) {
                 return {
-                    resultCd: '400',
+                    resultCd: '400', // 클라이언트 에러 코드
                     resultMsg: '인증번호가 존재하지 않습니다.',
                 }
             }
 
             if (certData.cert_yn === 'Y') {
                 return {
-                    resultCd: '400', // 사용자 입력 오류 코드
+                    resultCd: '400', // 클라이언트 에러 코드
                     resultMsg: '이미 인증된 이메일입니다.',
                 }
             }
@@ -252,7 +252,7 @@ export const memberService = {
 
             if (certData.expires_at < currentTimestamp) {
                 return {
-                    resultCd: '400', // 사용자 입력 오류 코드
+                    resultCd: '400', // 클라이언트 에러 코드
                     resultMsg: '인증번호가 만료되었습니다.',
                 }
             }
@@ -267,7 +267,7 @@ export const memberService = {
             }
 
             return {
-                resultCd: '000', // 성공 코드
+                resultCd: '201', // 성공 코드
                 resultMsg: '인증번호가 확인되었습니다.',
                 data: {
                     userId: certData.user_id,
@@ -281,6 +281,30 @@ export const memberService = {
                 resultCd: '500', // 서버 오류 코드
                 resultMsg: '이메일 인증번호 인증 중 오류가 발생했습니다.' + '[' + error + ']',
             }
+        }
+    },
+
+    async refreshAccessToken(refreshToken: string) {
+        try {
+            // 리프레시 토큰 검증
+            const { valid, decoded, error } = jwtUtils.verifyToken(refreshToken)
+            if (!valid) {
+                return { error: 'Invalid refresh token' }
+            }
+
+            // 토큰 페이로드 생성
+            const tokenPayload: TokenPayload = {
+                userId: decoded.userId, // decoded에서 userId를 가져옵니다.
+                password: decoded.password, // decoded에서 password를 가져옵니다.
+            }
+
+            // 새로운 접근 토큰 생성
+            const newAccessToken = jwtUtils.generateTokens(tokenPayload)
+
+            return { accessToken: newAccessToken }
+        } catch (error) {
+            console.error('토큰 재발급 에러:', error)
+            return { error: 'Failed to refresh access token' }
         }
     },
 }
