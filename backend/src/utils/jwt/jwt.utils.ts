@@ -9,7 +9,6 @@ export const jwtUtils = {
             const accessToken = jwt.sign(
                 {
                     userId: payload.userId,
-                    password: payload.password,
                     tokenType: 'access',
                     expiresIn: jwtConfig.expiresIn,
                 },
@@ -20,7 +19,6 @@ export const jwtUtils = {
             const refreshToken = jwt.sign(
                 {
                     userId: payload.userId,
-                    password: payload.password,
                     tokenType: 'refresh',
                     expiresIn: jwtConfig.refreshExpiresIn,
                 },
@@ -29,39 +27,38 @@ export const jwtUtils = {
 
             return { accessToken, refreshToken }
         } catch (error) {
-            console.error('Token generation error:', error)
-            throw new Error('토큰 생성 중 오류가 발생했습니다.')
+            throw new Error('토큰 생성 중 오류가 발생했습니다.' + '[' + error + ']')
         }
     },
     // 토큰 검증
     verifyToken(token: string) {
         try {
             const decoded = jwt.verify(token, jwtConfig.secretKey) as jwt.JwtPayload
-            console.log('decoded', decoded)
             // 토큰 만료 시간 확인
             const currentTime = Math.floor(Date.now() / 1000)
             if (decoded.exp && decoded.exp < currentTime) {
                 return {
-                    valid: false,
-                    error: '토큰이 만료되었습니다.',
-                    isExpired: true,
+                    resultCd: 400,
+                    resultMsg: '토큰이 만료되었습니다.',
                 }
             }
 
-            return { valid: true, decoded }
+            return {
+                resultCd: 201,
+                resultMsg: '토큰 검증 성공',
+                data: decoded,
+            }
         } catch (error) {
             // JWT 검증 실패 시 에러 타입 구분
             if (error instanceof jwt.TokenExpiredError) {
                 return {
-                    valid: false,
-                    error: '토큰이 만료되었습니다.',
-                    isExpired: true,
+                    resultCd: 400,
+                    resultMsg: '토큰이 만료되었습니다.',
                 }
             }
             return {
-                valid: false,
-                error: '유효하지 않은 토큰입니다.',
-                isExpired: false,
+                resultCd: 400,
+                resultMsg: '유효하지 않은 토큰입니다.',
             }
         }
     },
