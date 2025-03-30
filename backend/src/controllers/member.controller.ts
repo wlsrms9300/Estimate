@@ -6,12 +6,16 @@ export const memberController = {
     async getMembers(req: Request, res: Response) {
         try {
             const { userType, grade } = req.query as unknown as EM_MEMBER
-            console.log(userType, grade)
             const data = await memberService.getData('EM_MEMBER', { userType, grade })
-            res.json(data)
+            res.json({
+                resultCd: '200',
+                resultMsg: '멤버 데이터 조회 성공',
+                data: data,
+            })
         } catch (error: any) {
-            res.status(500).json({
-                error: error.message || '멤버 데이터 조회 중 오류가 발생했습니다.',
+            res.json({
+                resultCd: '500',
+                resultMsg: error.message || '멤버 데이터 조회 중 오류가 발생했습니다.',
             })
         }
     },
@@ -22,16 +26,21 @@ export const memberController = {
             const result = await memberService.signup('EM_MEMBER', req.body)
 
             if (result.resultCd !== '000') {
-                return res.status(400).json(result)
+                return res.json({
+                    resultCd: '400',
+                    resultMsg: result.resultMsg,
+                })
             }
 
-            res.status(201).json(result)
+            res.json({
+                resultCd: '201',
+                resultMsg: '회원가입이 완료되었습니다.',
+                data: result.data,
+            })
         } catch (error) {
-            console.error('회원가입 에러:', error)
-            res.status(500).json({
-                success: false,
-                message: '회원가입 처리 중 오류가 발생했습니다.',
-                error: error instanceof Error ? error.message : '알 수 없는 오류',
+            res.json({
+                resultCd: '500',
+                resultMsg: '회원가입 처리 중 오류가 발생했습니다.' + '[' + error + ']',
             })
         }
     },
@@ -42,15 +51,16 @@ export const memberController = {
             const result = await memberService.login({ userId, password })
 
             res.json({
-                resultCd: '000',
+                resultCd: '200',
+                resultMsg: '로그인 성공',
                 data: {
                     user: result.user,
                     accessToken: result.accessToken,
                 },
             })
         } catch (error: any) {
-            res.status(401).json({
-                resultCd: '100',
+            res.json({
+                resultCd: '401',
                 resultMsg: '로그인 중 오류가 발생했습니다.' + '[' + error.message + ']',
             })
         }
@@ -58,15 +68,19 @@ export const memberController = {
 
     //이메일 인증번호 발송
     async emailCertSend(req: Request, res: Response) {
+        console.log('emailCertSend')
         try {
             const { userId } = req.body
             const result = await memberService.emailCertSend(userId)
-            res.status(200).json(result)
+            res.json({
+                resultCd: result.resultCd,
+                resultMsg: result.resultMsg,
+                data: result.data,
+            })
         } catch (error) {
-            console.error('이메일 인증 발송 에러:', error)
-            res.status(500).json({
-                success: false,
-                message: error instanceof Error ? error.message : '이메일 인증번호 발송 중 오류가 발생했습니다.',
+            res.json({
+                resultCd: '500',
+                resultMsg: '이메일 인증번호 발송 중 오류가 발생했습니다.' + '[' + error + ']',
             })
         }
     },
@@ -76,12 +90,49 @@ export const memberController = {
         try {
             const { userId, certNo } = req.body
             const result = await memberService.emailCertCheck(userId, certNo)
-            res.status(200).json(result)
+            res.json({
+                resultCd: result.resultCd,
+                resultMsg: result.resultMsg,
+                data: result.data,
+            })
         } catch (error) {
-            console.error('이메일 인증 인증 에러:', error)
-            res.status(500).json({
-                success: false,
-                message: error instanceof Error ? error.message : '이메일 인증번호 인증 중 오류가 발생했습니다.',
+            res.json({
+                resultCd: '500',
+                resultMsg: '이메일 인증번호 인증 중 오류가 발생했습니다.' + '[' + error + ']',
+            })
+        }
+    },
+
+    async refreshToken(req: Request, res: Response) {
+        const { refreshToken } = req.body
+
+        if (!refreshToken) {
+            return res.json({
+                resultCd: '400',
+                resultMsg: '리프레시 토큰이 필요합니다.',
+            })
+        }
+
+        try {
+            // 리프레시 토큰 검증 및 새로운 접근 토큰 발급
+            const { accessToken, error } = await memberService.refreshAccessToken(refreshToken)
+
+            if (error) {
+                return res.json({
+                    resultCd: '401',
+                    resultMsg: '리프레시 토큰이 유효하지 않습니다.' + '[' + error + ']',
+                })
+            }
+
+            res.json({
+                resultCd: '200',
+                resultMsg: '토큰 재발급 성공',
+                accessToken,
+            })
+        } catch (error) {
+            res.json({
+                resultCd: '500',
+                resultMsg: '토큰 재발급 중 오류가 발생했습니다.' + '[' + error + ']',
             })
         }
     },
