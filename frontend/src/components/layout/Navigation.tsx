@@ -14,6 +14,7 @@ import {
 } from '@ant-design/icons'
 import { soMainStyles } from '../../styles/somain.styles'
 import { useNavigate } from 'react-router-dom'
+import LogoText from '../../assets/images/logo-text.png'
 
 const { Sider } = Layout
 

@@ -18,6 +18,13 @@ const queryClient = new QueryClient({
             staleTime: 1000 * 2,
         },
         mutations: {
+            // queryClient → useMutation → mutate 순으로 오버라이드
+            onSuccess: (data: any) => {
+                console.log('Mutation success:', data)
+            },
+            onSettled: (data: any) => {
+                console.log('Mutation settled:', data)
+            },
             onError: (error: any) => {
                 console.error('Mutation failed:', error)
             },
