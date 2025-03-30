@@ -14,22 +14,6 @@ const transporter = nodemailer.createTransport({
 })
 
 export const memberService = {
-    async getData(tableName: string, filters?: { userType?: string; grade?: string }) {
-        let query = supabase.from(tableName).select('*')
-        if (filters) {
-            if (filters.userType) {
-                query = query.eq('user_type', filters.userType)
-            }
-            if (filters.grade) {
-                query = query.eq('grade', filters.grade)
-            }
-        }
-
-        const { data, error } = await query
-        if (error) throw error
-        return transformData.toCamelCase(data)
-    },
-
     //회원가입
     async signup(tableName: string, memberData: any) {
         let data = { ...memberData }
@@ -46,26 +30,25 @@ export const memberService = {
                 // PostgreSQL unique violation 에러 코드: 23505
                 if (error.code === '23505') {
                     return {
-                        resultCd: '400', // 클라이언트 에러 코드
+                        resultCd: 400, // 클라이언트 에러 코드
                         resultMsg: '이미 사용 중인 아이디입니다.' + '[' + error.message + ']',
                     }
                 }
                 return {
-                    resultCd: '400', // 클라이언트 에러 코드
+                    resultCd: 400, // 클라이언트 에러 코드
                     resultMsg: '데이터베이스 오류가 발생했습니다.' + '[' + error.message + ']',
                 }
             }
 
             return {
-                resultCd: '201', // 성공 코드
+                resultCd: 201, // 성공 코드
                 resultMsg: '회원가입이 완료되었습니다.',
                 data: transformData.toCamelCase(result),
             }
-        } catch (error) {
-            console.error('회원가입 에러:', error)
+        } catch (error: any) {
             return {
-                resultCd: '500', // 서버 오류 코드
-                resultMsg: '회원가입 처리 중 오류가 발생했습니다.',
+                resultCd: 500, // 서버 오류 코드
+                resultMsg: '회원가입 처리 중 오류가 발생했습니다.' + '[' + error.message + ']',
             }
         }
     },
@@ -77,7 +60,7 @@ export const memberService = {
 
         if (error || !data) {
             return {
-                resultCd: '400', // 클라이언트 에러 코드
+                resultCd: 400, // 클라이언트 에러 코드
                 resultMsg: '로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.',
             }
         }
@@ -85,7 +68,7 @@ export const memberService = {
         // 비밀번호 비교 (암호화하지 않고 직접 비교)
         if (data.password !== password) {
             return {
-                resultCd: '400', // 클라이언트 에러 코드
+                resultCd: 400, // 클라이언트 에러 코드
                 resultMsg: '로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.',
             }
         }
@@ -102,7 +85,8 @@ export const memberService = {
         await this.updateUserLoginInfo(data.user_id, refreshToken)
 
         return {
-            resultCd: '201', // 성공 코드
+            resultCd: 201, // 성공 코드
+            resultMsg: '로그인 성공',
             user: transformData.toCamelCase(data),
             accessToken,
             refreshToken,
@@ -123,7 +107,10 @@ export const memberService = {
                 .update({ last_login_at: currentTimestamp })
                 .eq('user_id', userId)
             if (memberUpdateError) {
-                throw new Error(`Failed to update last_login_at: ${memberUpdateError.message}`)
+                return {
+                    resultCd: 500,
+                    resultMsg: '로그인 정보 업데이트 중 오류가 발생했습니다.' + '[' + memberUpdateError.message + ']',
+                }
             }
 
             // em_member_refresh_token 테이블 upsert 수행
@@ -141,13 +128,18 @@ export const memberService = {
             )
 
             if (tokenUpsertError) {
-                throw new Error(`Failed to upsert refresh token: ${tokenUpsertError.message}`)
+                return {
+                    resultCd: 500,
+                    resultMsg: '리프레시 토큰 업데이트 중 오류가 발생했습니다.' + '[' + tokenUpsertError.message + ']',
+                }
             }
 
             return true
-        } catch (error) {
-            console.error('Error updating user login info:', error)
-            throw error
+        } catch (error: any) {
+            return {
+                resultCd: 500,
+                resultMsg: '로그인 정보 업데이트 중 오류가 발생했습니다.' + '[' + error.message + ']',
+            }
         }
     },
 
@@ -160,7 +152,7 @@ export const memberService = {
             // 이미 등록된 사용자가 있는 경우
             if (existingUser) {
                 return {
-                    resultCd: '400',
+                    resultCd: 400,
                     resultMsg: '이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요.',
                     data: transformData.toCamelCase(existingUser),
                 }
@@ -186,7 +178,7 @@ export const memberService = {
 
             if (certError) {
                 return {
-                    resultCd: '100', // DB 관련 오류 코드
+                    resultCd: 500,
                     resultMsg: '인증번호 저장 중 오류가 발생했습니다.' + '[' + certError.message + ']',
                 }
             }
@@ -207,16 +199,15 @@ export const memberService = {
             await transporter.sendMail(mailOptions)
 
             return {
-                resultCd: '201',
+                resultCd: 201,
                 resultMsg: '인증번호가 이메일로 발송되었습니다.',
                 data: {
                     userId: userId,
-                    certNo: certNo,
                 },
             }
         } catch (error) {
             return {
-                resultCd: '500', // 서버 오류 코드
+                resultCd: 500, // 서버 오류 코드
                 resultMsg: '이메일 인증번호 발송 중 오류가 발생했습니다.' + '[' + error + ']',
             }
         }
@@ -235,14 +226,14 @@ export const memberService = {
 
             if (!certData) {
                 return {
-                    resultCd: '400', // 클라이언트 에러 코드
+                    resultCd: 400, // 클라이언트 에러 코드
                     resultMsg: '인증번호가 존재하지 않습니다.',
                 }
             }
 
             if (certData.cert_yn === 'Y') {
                 return {
-                    resultCd: '400', // 클라이언트 에러 코드
+                    resultCd: 400, // 클라이언트 에러 코드
                     resultMsg: '이미 인증된 이메일입니다.',
                 }
             }
@@ -252,7 +243,7 @@ export const memberService = {
 
             if (certData.expires_at < currentTimestamp) {
                 return {
-                    resultCd: '400', // 클라이언트 에러 코드
+                    resultCd: 400, // 클라이언트 에러 코드
                     resultMsg: '인증번호가 만료되었습니다.',
                 }
             }
@@ -261,13 +252,13 @@ export const memberService = {
             const { error: updateError } = await supabase.from('EM_EMAIL_CERT').update({ cert_yn: 'Y' }).eq('user_id', userId)
             if (updateError) {
                 return {
-                    resultCd: '100', // DB 관련 오류 코드
+                    resultCd: 500,
                     resultMsg: '인증번호 업데이트 중 오류가 발생했습니다.',
                 }
             }
 
             return {
-                resultCd: '201', // 성공 코드
+                resultCd: 201,
                 resultMsg: '인증번호가 확인되었습니다.',
                 data: {
                     userId: certData.user_id,
@@ -278,7 +269,7 @@ export const memberService = {
             }
         } catch (error) {
             return {
-                resultCd: '500', // 서버 오류 코드
+                resultCd: 500,
                 resultMsg: '이메일 인증번호 인증 중 오류가 발생했습니다.' + '[' + error + ']',
             }
         }
@@ -294,8 +285,8 @@ export const memberService = {
 
             // 토큰 페이로드 생성
             const tokenPayload: TokenPayload = {
-                userId: decoded.userId, // decoded에서 userId를 가져옵니다.
-                password: decoded.password, // decoded에서 password를 가져옵니다.
+                userId: decoded?.userId, // decoded에서 userId를 가져옵니다.
+                password: decoded?.password, // decoded에서 password를 가져옵니다.
             }
 
             // 새로운 접근 토큰 생성
