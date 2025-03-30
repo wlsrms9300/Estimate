@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { sendVerificationCode, verifyCertNo, signup } from '../../services/account/authService'
+import { openNotification } from '../common'
 
 /**
  * @mutation useSendVerificationCode
@@ -10,11 +11,12 @@ export const useSendVerificationCode = (onSuccess: () => void) => {
     return useMutation({
         mutationFn: sendVerificationCode,
         onSuccess: (response) => {
-            console.log('response', response)
-            onSuccess()
-        },
-        onError: (error) => {
-            console.error('Error sending email:', error)
+            if (response.resultCd === 201) {
+                openNotification('이메일 인증코드 발송', response.resultMsg, 'success')
+                onSuccess()
+            } else {
+                openNotification('이메일 인증코드 발송 실패', '이메일을 확인해 주세요.', 'error')
+            }
         },
     })
 }
@@ -28,11 +30,12 @@ export const useVerifyCertNo = (onSuccess: () => void) => {
     return useMutation({
         mutationFn: verifyCertNo,
         onSuccess: (response) => {
-            console.log('response', response)
-            onSuccess()
-        },
-        onError: (error) => {
-            console.error('Error verifying auth code:', error)
+            if (response.resultCd === 201) {
+                openNotification('인증코드 확인 성공', response.resultMsg, 'success')
+                onSuccess()
+            } else {
+                openNotification('인증코드 확인 실패', '인증코드를 확인 해주세요.', 'error')
+            }
         },
     })
 }
@@ -46,11 +49,12 @@ export const useSignup = (onSuccess: () => void) => {
     return useMutation({
         mutationFn: signup,
         onSuccess: (response) => {
-            console.log('response', response)
-            onSuccess()
-        },
-        onError: (error) => {
-            console.error('Error signing up:', error)
+            if (response.resultCd === 201) {
+                openNotification('회원가입 성공', response.resultMsg, 'success')
+                onSuccess()
+            } else {
+                openNotification('회원가입 실패', '회원정보를 확인 해주세요.', 'error')
+            }
         },
     })
 }
