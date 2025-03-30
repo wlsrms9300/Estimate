@@ -9,8 +9,6 @@ interface StepAgreeProps {
 }
 
 export default function StepAgree({ handlePrev, handleNext }: StepAgreeProps) {
-    const { notification } = App.useApp()
-
     const {
         agreeTermsOfAge,
         agreeTermsOfUse,
@@ -35,14 +33,6 @@ export default function StepAgree({ handlePrev, handleNext }: StepAgreeProps) {
     const isSubmitDisabled = !agreeTermsOfAge || !agreeTermsOfUse || !agreeTermsOfPersonal
 
     const mutateSignup = useSignup(handleNext)
-
-    const openNotification = (message: string, description: string) => {
-        notification.open({
-            message: message,
-            description: description,
-            placement: 'bottomRight',
-        })
-    }
 
     const onSubmit = () => {
         mutateSignup.mutate({

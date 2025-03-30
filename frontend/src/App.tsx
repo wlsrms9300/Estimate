@@ -26,21 +26,19 @@ const queryClient = new QueryClient({
 })
 
 function MyApp() {
-    // const { message, modal, notification } = App.useApp()
-
     return (
         <QueryClientProvider client={queryClient}>
             <ConfigProvider theme={theme}>
-                {/* <App> */}
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="/" element={<Introduce />} />
-                        <Route path="/so" element={<MainLayout />}>
-                            <Route path="estimate" element={<EstimateMenu />} />
-                        </Route>
-                    </Routes>
-                </BrowserRouter>
-                {/* </App> */}
+                <App>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="/" element={<Introduce />} />
+                            <Route path="/so" element={<MainLayout />}>
+                                <Route path="estimate" element={<EstimateMenu />} />
+                            </Route>
+                        </Routes>
+                    </BrowserRouter>
+                </App>
             </ConfigProvider>
         </QueryClientProvider>
     )

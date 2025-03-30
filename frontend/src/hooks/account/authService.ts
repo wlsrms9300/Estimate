@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { sendVerificationCode, verifyCertNo, signup } from '../../services/account/authService'
-import { openNotification } from '../common'
+import useCustomNotification from '../notification'
 
 /**
  * @mutation useSendVerificationCode
@@ -8,14 +8,16 @@ import { openNotification } from '../common'
  * @description 이메일 인증 코드 전송
  */
 export const useSendVerificationCode = (onSuccess: () => void) => {
+    const { openNotification } = useCustomNotification()
+
     return useMutation({
         mutationFn: sendVerificationCode,
         onSuccess: (response) => {
             if (response.resultCd === 201) {
-                openNotification('이메일 인증코드 발송', response.resultMsg, 'success')
+                openNotification('success', '이메일 인증코드 발송', response.resultMsg)
                 onSuccess()
             } else {
-                openNotification('이메일 인증코드 발송 실패', '이메일을 확인해 주세요.', 'error')
+                openNotification('error', '이메일 인증코드 발송 실패', '이메일을 확인해 주세요.')
             }
         },
     })
@@ -27,14 +29,16 @@ export const useSendVerificationCode = (onSuccess: () => void) => {
  * @description 이메일 인증 코드 확인
  */
 export const useVerifyCertNo = (onSuccess: () => void) => {
+    const { openNotification } = useCustomNotification()
+
     return useMutation({
         mutationFn: verifyCertNo,
         onSuccess: (response) => {
             if (response.resultCd === 201) {
-                openNotification('인증코드 확인 성공', response.resultMsg, 'success')
+                openNotification('success', '인증코드 확인 성공', response.resultMsg)
                 onSuccess()
             } else {
-                openNotification('인증코드 확인 실패', '인증코드를 확인 해주세요.', 'error')
+                openNotification('error', '인증코드 확인 실패', '인증코드를 확인 해주세요.')
             }
         },
     })
@@ -46,14 +50,16 @@ export const useVerifyCertNo = (onSuccess: () => void) => {
  * @description 회원가입
  */
 export const useSignup = (onSuccess: () => void) => {
+    const { openNotification } = useCustomNotification()
+
     return useMutation({
         mutationFn: signup,
         onSuccess: (response) => {
             if (response.resultCd === 201) {
-                openNotification('회원가입 성공', response.resultMsg, 'success')
+                openNotification('success', '회원가입 성공', response.resultMsg)
                 onSuccess()
             } else {
-                openNotification('회원가입 실패', '회원정보를 확인 해주세요.', 'error')
+                openNotification('error', '회원가입 실패', '회원정보를 확인 해주세요.')
             }
         },
     })
