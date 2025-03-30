@@ -1,4 +1,4 @@
-import { Flex, Layout, Typography, Checkbox, Button, Form } from 'antd'
+import { Flex, Layout, Typography, Checkbox, Button, Form, App } from 'antd'
 import { useAuthStore } from '../../stores/authStore'
 import { accountStyles } from '../../styles/account.styles'
 import { RightOutlined } from '@ant-design/icons'
@@ -9,6 +9,8 @@ interface StepAgreeProps {
 }
 
 export default function StepAgree({ handlePrev, handleNext }: StepAgreeProps) {
+    const { notification } = App.useApp()
+
     const {
         agreeTermsOfAge,
         agreeTermsOfUse,
@@ -33,6 +35,14 @@ export default function StepAgree({ handlePrev, handleNext }: StepAgreeProps) {
     const isSubmitDisabled = !agreeTermsOfAge || !agreeTermsOfUse || !agreeTermsOfPersonal
 
     const mutateSignup = useSignup(handleNext)
+
+    const openNotification = (message: string, description: string) => {
+        notification.open({
+            message: message,
+            description: description,
+            placement: 'bottomRight',
+        })
+    }
 
     const onSubmit = () => {
         mutateSignup.mutate({
