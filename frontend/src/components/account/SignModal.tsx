@@ -6,13 +6,14 @@ import StepAuthCode from './StepAuthCode'
 import StepPassword from './StepPassword'
 import StepAgree from './StepAgree'
 import StartType from './StartType'
+import StepLogin from './StepLogin'
 import { useAuthStore } from '../../stores/authStore'
-interface SignInProps {
+interface SignModalProps {
     isModalOpen: boolean
     handleCancel: () => void
 }
 
-export const SignIn = ({ isModalOpen, handleCancel }: SignInProps) => {
+export const SignModal = ({ isModalOpen, handleCancel }: SignModalProps) => {
     const [step, setStep] = useState<number>(0)
     const reset = useAuthStore((state) => state.reset)
 
@@ -29,8 +30,8 @@ export const SignIn = ({ isModalOpen, handleCancel }: SignInProps) => {
      * @description 이전 버튼 클릭 시 이벤트
      */
     const handlePrev = useCallback(() => {
-        if (step === 3) {
-            // 이메일 인증 후 뒤로가기 시 인증번호 발송부터 다시 시작
+        if (step === 5 || step === 3) {
+            // 이메일 인증 후 뒤로가기 시 이메일 입력부터 다시 시작
             setStep(1)
         } else {
             setStep(step - 1)
@@ -41,9 +42,16 @@ export const SignIn = ({ isModalOpen, handleCancel }: SignInProps) => {
      * @function handleNext
      * @description 다음 버튼 클릭 시 이벤트
      */
-    const handleNext = useCallback(() => {
-        setStep(step + 1)
-    }, [step])
+    const handleNext = useCallback(
+        (goToStep?: number) => {
+            if (goToStep) {
+                setStep(goToStep)
+            } else {
+                setStep(step + 1)
+            }
+        },
+        [step],
+    )
 
     useEffect(() => {
         if (!isModalOpen) {
@@ -59,6 +67,7 @@ export const SignIn = ({ isModalOpen, handleCancel }: SignInProps) => {
             {step === 2 && <StepAuthCode handlePrev={handlePrev} handleNext={handleNext} />}
             {step === 3 && <StepPassword handlePrev={handlePrev} handleNext={handleNext} />}
             {step === 4 && <StepAgree handlePrev={handlePrev} handleNext={handleCancel} />}
+            {step === 5 && <StepLogin handlePrev={handlePrev} />}
         </Modal>
     )
 }

@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase'
-import { transformData, jwtUtils } from '../utils'
+import { transformData, jwtUtils, createResponse } from '../utils'
 import { TokenPayload } from '../interfaces/auth.interface'
 import nodemailer from 'nodemailer'
 import bcrypt from 'bcrypt'
@@ -35,27 +35,14 @@ export const memberService = {
             if (error) {
                 // PostgreSQL unique violation 에러 코드: 23505
                 if (error.code === '23505') {
-                    return {
-                        resultCd: 400, // 클라이언트 에러 코드
-                        resultMsg: '이미 사용 중인 아이디입니다.' + '[' + error.message + ']',
-                    }
+                    return createResponse(null, 0, 400, '이미 사용 중인 아이디입니다.' + '[' + error.message + ']')
                 }
-                return {
-                    resultCd: 500, // 클라이언트 에러 코드
-                    resultMsg: '데이터베이스 오류가 발생했습니다.' + '[' + error.message + ']',
-                }
+                return createResponse(null, 0, 500, '데이터베이스 오류가 발생했습니다.' + '[' + error.message + ']')
             }
 
-            return {
-                resultCd: 201, // 성공 코드
-                resultMsg: '회원가입이 완료되었습니다.',
-                data: transformData.toCamelCase(result),
-            }
+            return createResponse(transformData.toCamelCase(result), 0, 201, '회원가입이 완료되었습니다.')
         } catch (error: any) {
-            return {
-                resultCd: 500, // 서버 오류 코드
-                resultMsg: '회원가입 처리 중 오류가 발생했습니다.' + '[' + error.message + ']',
-            }
+            return createResponse(null, 0, 500, '회원가입 처리 중 오류가 발생했습니다.' + '[' + error.message + ']')
         }
     },
 
@@ -65,18 +52,13 @@ export const memberService = {
         const { data, error } = await supabase.from('EM_MEMBER').select('*').eq('user_id', userId).single() // single()을 사용하여 단일 사용자만 가져옴
 
         if (!data) {
-            return {
-                resultCd: 400, // 클라이언트 에러 코드
-                resultMsg: '로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.',
-            }
+            return createResponse(null, 0, 400, '로그인 실패: 로그인 정보가 없습니다.')
         }
 
         // 비밀번호 비교 (암호화하지 않고 직접 비교)
-        if (data.password !== password) {
-            return {
-                resultCd: 400, // 클라이언트 에러 코드
-                resultMsg: '로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.',
-            }
+        const isPasswordMatch = bcrypt.compareSync(password, data.password)
+        if (!isPasswordMatch) {
+            return createResponse(null, 0, 400, '로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.')
         }
 
         // 토큰 페이로드 생성
@@ -89,13 +71,16 @@ export const memberService = {
 
         await this.updateUserLoginInfo(data.user_id, refreshToken)
 
-        return {
-            resultCd: 201, // 성공 코드
-            resultMsg: '로그인 성공',
-            user: transformData.toCamelCase(data),
-            accessToken,
-            refreshToken,
-        }
+        return createResponse(
+            {
+                user: transformData.toCamelCase(data),
+                accessToken,
+                refreshToken,
+            },
+            0,
+            201,
+            '로그인 성공',
+        )
     },
 
     // 로그인 정보 업데이트
@@ -112,10 +97,7 @@ export const memberService = {
                 .update({ last_login_at: currentTimestamp })
                 .eq('user_id', userId)
             if (memberUpdateError) {
-                return {
-                    resultCd: 500,
-                    resultMsg: '로그인 정보 업데이트 중 오류가 발생했습니다.' + '[' + memberUpdateError.message + ']',
-                }
+                return createResponse(null, 0, 500, '로그인 정보 업데이트 중 오류가 발생했습니다.' + '[' + memberUpdateError.message + ']')
             }
 
             // em_member_refresh_token 테이블 upsert 수행
@@ -133,18 +115,12 @@ export const memberService = {
             )
 
             if (tokenUpsertError) {
-                return {
-                    resultCd: 500,
-                    resultMsg: '리프레시 토큰 업데이트 중 오류가 발생했습니다.' + '[' + tokenUpsertError.message + ']',
-                }
+                return createResponse(null, 0, 500, '리프레시 토큰 업데이트 중 오류가 발생했습니다.' + '[' + tokenUpsertError.message + ']')
             }
 
             return true
         } catch (error: any) {
-            return {
-                resultCd: 500,
-                resultMsg: '로그인 정보 업데이트 중 오류가 발생했습니다.' + '[' + error.message + ']',
-            }
+            return createResponse(null, 0, 500, '로그인 정보 업데이트 중 오류가 발생했습니다.' + '[' + error.message + ']')
         }
     },
 
@@ -156,11 +132,7 @@ export const memberService = {
 
             // 이미 등록된 사용자가 있는 경우
             if (existingUser) {
-                return {
-                    resultCd: 400,
-                    resultMsg: '이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요.',
-                    data: transformData.toCamelCase(existingUser),
-                }
+                return createResponse(null, 10000, 201, '이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요.')
             }
 
             // 6자리 인증번호 생성
@@ -182,10 +154,7 @@ export const memberService = {
             )
 
             if (certError) {
-                return {
-                    resultCd: 500,
-                    resultMsg: '인증번호 저장 중 오류가 발생했습니다.' + '[' + certError.message + ']',
-                }
+                return createResponse(null, 0, 500, '인증번호 저장 중 오류가 발생했습니다.' + '[' + certError.message + ']')
             }
 
             // 이메일 발송
@@ -203,15 +172,9 @@ export const memberService = {
 
             await transporter.sendMail(mailOptions)
 
-            return {
-                resultCd: 201,
-                resultMsg: '인증번호가 이메일로 발송되었습니다.',
-            }
+            return createResponse(null, 0, 201, '인증번호가 이메일로 발송되었습니다.')
         } catch (error) {
-            return {
-                resultCd: 500, // 서버 오류 코드
-                resultMsg: '이메일 인증번호 발송 중 오류가 발생했습니다.' + '[' + error + ']',
-            }
+            return createResponse(null, 0, 500, '이메일 인증번호 발송 중 오류가 발생했습니다.' + '[' + error + ']')
         }
     },
 
@@ -227,53 +190,39 @@ export const memberService = {
                 .single()
 
             if (!certData) {
-                return {
-                    resultCd: 400,
-                    resultMsg: '인증번호가 존재하지 않습니다.',
-                }
+                return createResponse(null, 0, 400, '인증번호가 존재하지 않습니다.')
             }
 
             if (certData.cert_yn === 'Y') {
-                return {
-                    resultCd: 400,
-                    resultMsg: '이미 인증된 이메일입니다.',
-                }
+                return createResponse(null, 0, 400, '이미 인증된 이메일입니다.')
             }
 
             // 인증번호 만료 확인
             const currentTimestamp = new Date().toISOString()
 
             if (certData.expires_at < currentTimestamp) {
-                return {
-                    resultCd: 400,
-                    resultMsg: '인증번호가 만료되었습니다.',
-                }
+                return createResponse(null, 0, 400, '인증번호가 만료되었습니다.')
             }
 
             // 인증번호 업데이트
             const { error: updateError } = await supabase.from('EM_EMAIL_CERT').update({ cert_yn: 'Y' }).eq('user_id', userId)
             if (updateError) {
-                return {
-                    resultCd: 500,
-                    resultMsg: '인증번호 업데이트 중 오류가 발생했습니다.',
-                }
+                return createResponse(null, 0, 500, '인증번호 업데이트 중 오류가 발생했습니다.')
             }
 
-            return {
-                resultCd: 201,
-                resultMsg: '인증번호가 확인되었습니다.',
-                data: {
+            return createResponse(
+                {
                     userId: certData.user_id,
                     certNo: certData.cert_no,
                     createdAt: certData.created_at,
                     expiresAt: certData.expires_at,
                 },
-            }
+                0,
+                201,
+                '인증번호가 확인되었습니다.',
+            )
         } catch (error) {
-            return {
-                resultCd: 500,
-                resultMsg: '이메일 인증번호 인증 중 오류가 발생했습니다.' + '[' + error + ']',
-            }
+            return createResponse(null, 0, 500, '이메일 인증번호 인증 중 오류가 발생했습니다.' + '[' + error + ']')
         }
     },
 

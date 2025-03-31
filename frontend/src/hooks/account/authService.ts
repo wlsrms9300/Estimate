@@ -1,23 +1,25 @@
 import { useMutation } from '@tanstack/react-query'
-import { sendVerificationCode, verifyCertNo, signup } from '../../services/account/authService'
+import { sendVerificationCode, verifyCertNo, signup, login } from '../../services/account/authService'
 import useCustomNotification from '../notification'
 import { SHA256 } from 'crypto-js'
-import { SignupForm } from '../../types/account/auth'
+import { SignupForm, LoginForm } from '../../types/account/auth'
 
 /**
  * @mutation useSendVerificationCode
  * @post /member/emailCertSend
  * @description 이메일 인증 코드 전송
  */
-export const useSendVerificationCode = (onSuccess?: () => void) => {
+export const useSendVerificationCode = (onSuccess?: (step?: number) => void) => {
     const { openNotification } = useCustomNotification()
 
     return useMutation({
         mutationFn: sendVerificationCode,
         onSuccess: (response) => {
             if (response.resultCd === 201) {
-                openNotification('success', '이메일 인증코드 발송', response.resultMsg)
-                onSuccess?.()
+                if (response.code !== 10000) {
+                    openNotification('success', '이메일 인증코드 발송', response.resultMsg)
+                }
+                onSuccess?.(response.code === 10000 ? 5 : 0)
             } else {
                 openNotification('error', '이메일 인증코드 발송 실패', '이메일을 확인해 주세요.')
             }
@@ -66,6 +68,31 @@ export const useSignup = (onSuccess?: () => void) => {
                 onSuccess?.()
             } else {
                 openNotification('error', '회원가입 실패', '회원정보를 확인 해주세요.')
+            }
+        },
+    })
+}
+
+/**
+ * @mutation useLogin
+ * @post /member/login
+ * @description 로그인
+ */
+export const useLogin = (onSuccess?: () => void) => {
+    const { openNotification } = useCustomNotification()
+
+    return useMutation({
+        mutationFn: (data: LoginForm) => {
+            const copyData = { ...data, password: SHA256(data.password).toString() }
+
+            return login(copyData)
+        },
+        onSuccess: (response) => {
+            if (response.resultCd === 201) {
+                // openNotification('success', '로그인 성공', response.resultMsg)
+                onSuccess?.()
+            } else {
+                openNotification('error', '로그인 실패', response.resultMsg)
             }
         },
     })

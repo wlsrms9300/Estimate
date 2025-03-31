@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button, Modal } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { introduceStyles } from '../styles/introduce.styles'
-import { SignIn } from '../components/account/SignIn'
+import { SignModal } from '../components/account/SignModal'
 export default function Introduce() {
     const navigate = useNavigate()
     const heroImage = 'https://public.readdy.ai/ai/img_res/7f809449d14dab68b1e4bf06d1c09041.jpg'
@@ -49,7 +49,7 @@ export default function Introduce() {
                     </div>
                 </section>
             </main>
-            <SignIn isModalOpen={isModalOpen} handleCancel={handleCancel} />
+            <SignModal isModalOpen={isModalOpen} handleCancel={handleCancel} />
         </div>
     )
 }

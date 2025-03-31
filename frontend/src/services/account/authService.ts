@@ -29,3 +29,13 @@ export const signup = async (data: any) => {
     const response = await api.post('/member/signup', data)
     return response.data
 }
+
+/**
+ * @mutation login
+ * @post /member/login
+ * @description 로그인
+ */
+export const login = async (data: any) => {
+    const response = await api.post('/member/login', data)
+    return response.data
+}
