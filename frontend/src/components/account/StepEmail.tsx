@@ -1,4 +1,5 @@
-import { Flex, Layout, Typography, Input, Button, Form, App } from 'antd'
+import { useEffect } from 'react'
+import { Flex, Layout, Typography, Input, Button, Form } from 'antd'
 import { useForm, Controller } from 'react-hook-form'
 import { useAuthStore } from '../../stores/authStore'
 import { accountStyles } from '../../styles/account.styles'
@@ -14,13 +15,7 @@ interface EmailForm {
 }
 
 export default function StepEmail({ handlePrev, handleNext }: StepEmailProps) {
-    // const { notification } = App.useApp()
-    const {
-        control,
-        handleSubmit,
-        formState: { errors },
-        watch,
-    } = useForm<EmailForm>({
+    const { control, handleSubmit, setFocus, watch } = useForm<EmailForm>({
         defaultValues: {
             email: '',
         },
@@ -40,6 +35,10 @@ export default function StepEmail({ handlePrev, handleNext }: StepEmailProps) {
         setEmail(data.email)
         mutateEmail.mutate(data.email)
     }
+
+    useEffect(() => {
+        setFocus('email')
+    }, [])
 
     return (
         <Layout className={accountStyles.stepContainer}>

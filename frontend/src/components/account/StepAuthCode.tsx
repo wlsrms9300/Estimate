@@ -1,11 +1,12 @@
-// components/account/StepAuthCode.tsx
-import React from 'react'
-import { Flex, Layout, Typography, Input, Button, Form } from 'antd'
+import { useState, useEffect } from 'react'
+import { Flex, Layout, Typography, Input, Button, Form, Spin } from 'antd'
 import { useForm, Controller } from 'react-hook-form'
 import { useAuthStore } from '../../stores/authStore'
 import { accountStyles } from '../../styles/account.styles'
 import { validationPatterns } from '../../utils/validation'
-import { useVerifyCertNo } from '../../hooks/account/authService'
+import { useVerifyCertNo, useSendVerificationCode } from '../../hooks/account/authService'
+// components
+import Timer from '../common/Timer'
 
 interface StepCertNoProps {
     handlePrev: () => void
@@ -17,7 +18,7 @@ interface CertNoForm {
 }
 
 export default function StepCertNo({ handlePrev, handleNext }: StepCertNoProps) {
-    const { control, handleSubmit, watch } = useForm<CertNoForm>({
+    const { control, handleSubmit, watch, setFocus } = useForm<CertNoForm>({
         defaultValues: {
             certNo: '',
         },
@@ -27,8 +28,28 @@ export default function StepCertNo({ handlePrev, handleNext }: StepCertNoProps) 
     const certNo = watch('certNo')
     const email = useAuthStore((state) => state.email)
     const setCertNo = useAuthStore((state) => state.setCertNo)
+    const [reSend, setReSend] = useState(false)
 
     const mutateCertNo = useVerifyCertNo(handleNext)
+    const mutateEmail = useSendVerificationCode(() => setReSend(false))
+
+    /**
+     * @function handleTimerEnd
+     * @description 타이머 종료 이벤트
+     */
+    const handleTimerEnd = () => {
+        console.log('타이머 종료')
+        setReSend(true)
+    }
+
+    /**
+     * @function reSendCertNo
+     * @description 인증번호 재발송
+     */
+    const reSendCertNo = () => {
+        mutateEmail.mutate(email)
+        setFocus('certNo')
+    }
 
     /**
      * @function onSubmit
@@ -38,6 +59,10 @@ export default function StepCertNo({ handlePrev, handleNext }: StepCertNoProps) 
         setCertNo(data.certNo)
         mutateCertNo.mutate({ email: email, certNo: data.certNo })
     }
+
+    useEffect(() => {
+        setFocus('certNo')
+    }, [])
 
     return (
         <Layout className={accountStyles.stepContainer}>
@@ -79,6 +104,19 @@ export default function StepCertNo({ handlePrev, handleNext }: StepCertNoProps) 
                                     className="!rounded-xl"
                                     allowClear
                                     maxLength={6}
+                                    suffix={
+                                        reSend ? (
+                                            mutateEmail.isPending ? (
+                                                <Spin size="small" />
+                                            ) : (
+                                                <Typography.Link onClick={(e) => (e.preventDefault(), reSendCertNo())}>재발송</Typography.Link>
+                                            )
+                                        ) : (
+                                            <Timer minutes={5} onTimerEnd={handleTimerEnd}>
+                                                <Timer.Small />
+                                            </Timer>
+                                        )
+                                    }
                                 />
                             </Form.Item>
                         )}

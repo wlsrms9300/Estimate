@@ -2,6 +2,7 @@ import { supabase } from '../config/supabase'
 import { transformData, jwtUtils } from '../utils'
 import { TokenPayload } from '../interfaces/auth.interface'
 import nodemailer from 'nodemailer'
+import bcrypt from 'bcrypt'
 
 // 이메일 전송을 위한 트랜스포터 설정
 const transporter = nodemailer.createTransport({
@@ -22,6 +23,11 @@ export const memberService = {
         data.agreeTermsOfPersonalUse = memberData.agreeTermsOfPersonal || false
 
         delete data.agreeTermsOfPersonal
+
+        // bcrypt로 비밀번호 암호화 하기
+        const salt = bcrypt.genSaltSync(10)
+        const hash = bcrypt.hashSync(data.password, salt)
+        data.password = hash
 
         try {
             const { data: result, error } = await supabase.from(tableName).insert(transformData.toSnakeCase(data)).select()

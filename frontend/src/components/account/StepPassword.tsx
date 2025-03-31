@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Flex, Layout, Typography, Input, Button, Form } from 'antd'
 import { useForm, Controller } from 'react-hook-form'
 import { useAuthStore } from '../../stores/authStore'
@@ -15,7 +16,7 @@ interface PasswordForm {
 }
 
 export default function StepPassword({ handlePrev, handleNext }: StepPasswordProps) {
-    const { control, handleSubmit, watch } = useForm<PasswordForm>({
+    const { control, handleSubmit, watch, setFocus } = useForm<PasswordForm>({
         defaultValues: {
             password: '',
             passwordCheck: '',
@@ -38,6 +39,10 @@ export default function StepPassword({ handlePrev, handleNext }: StepPasswordPro
     }
 
     const isSubmitDisabled = !validatePassword(password) || password !== passwordCheck
+
+    useEffect(() => {
+        setFocus('password')
+    }, [])
 
     return (
         <Layout className={accountStyles.stepContainer}>
