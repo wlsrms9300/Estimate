@@ -11,7 +11,7 @@ export const memberController = {
             res.json(result)
         } catch (error: any) {
             res.json({
-                resultCd: 500,
+                resultCd: '500',
                 resultMsg: '회원가입 처리 중 오류가 발생했습니다.' + '[' + error.message + ']',
             })
         }
@@ -60,35 +60,16 @@ export const memberController = {
     },
 
     async refreshToken(req: Request, res: Response) {
-        const { refreshToken } = req.body
-
-        if (!refreshToken) {
-            return res.json({
-                resultCd: 400,
-                resultMsg: '리프레시 토큰이 필요합니다.',
-            })
-        }
+        const { userId } = req.body
 
         try {
             // 리프레시 토큰 검증 및 새로운 접근 토큰 발급
-            const { accessToken, error } = await memberService.refreshAccessToken(refreshToken)
-
-            if (error) {
-                return res.json({
-                    resultCd: '401',
-                    resultMsg: '리프레시 토큰이 유효하지 않습니다.' + '[' + error + ']',
-                })
-            }
-
-            res.json({
-                resultCd: 200,
-                resultMsg: '토큰 재발급 성공',
-                accessToken,
-            })
-        } catch (error) {
+            const result = await memberService.refreshAccessToken(userId)
+            res.json(result)
+        } catch (error: any) {
             res.json({
                 resultCd: 500,
-                resultMsg: '토큰 재발급 중 오류가 발생했습니다.' + '[' + error + ']',
+                resultMsg: '토큰 재발급 중 오류가 발생했습니다.' + '[' + error.message + ']',
             })
         }
     },

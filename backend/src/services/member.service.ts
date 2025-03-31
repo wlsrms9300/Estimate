@@ -35,7 +35,7 @@ export const memberService = {
                     }
                 }
                 return {
-                    resultCd: 400, // 클라이언트 에러 코드
+                    resultCd: 500, // 클라이언트 에러 코드
                     resultMsg: '데이터베이스 오류가 발생했습니다.' + '[' + error.message + ']',
                 }
             }
@@ -58,7 +58,7 @@ export const memberService = {
         const { userId, password } = memberData // userId와 password를 분리
         const { data, error } = await supabase.from('EM_MEMBER').select('*').eq('user_id', userId).single() // single()을 사용하여 단일 사용자만 가져옴
 
-        if (error || !data) {
+        if (!data) {
             return {
                 resultCd: 400, // 클라이언트 에러 코드
                 resultMsg: '로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.',
@@ -76,7 +76,6 @@ export const memberService = {
         // 토큰 페이로드 생성
         const tokenPayload: TokenPayload = {
             userId: data.user_id,
-            password: data.password,
         }
 
         // 토큰 생성
@@ -168,7 +167,7 @@ export const memberService = {
                     cert_no: certNo,
                     cert_yn: 'N',
                     created_at: new Date().toISOString(),
-                    expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30분 유효
+                    expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 30분 유효
                 },
                 {
                     onConflict: 'user_id',
@@ -201,9 +200,6 @@ export const memberService = {
             return {
                 resultCd: 201,
                 resultMsg: '인증번호가 이메일로 발송되었습니다.',
-                data: {
-                    userId: userId,
-                },
             }
         } catch (error) {
             return {
@@ -226,14 +222,14 @@ export const memberService = {
 
             if (!certData) {
                 return {
-                    resultCd: 400, // 클라이언트 에러 코드
+                    resultCd: 400,
                     resultMsg: '인증번호가 존재하지 않습니다.',
                 }
             }
 
             if (certData.cert_yn === 'Y') {
                 return {
-                    resultCd: 400, // 클라이언트 에러 코드
+                    resultCd: 400,
                     resultMsg: '이미 인증된 이메일입니다.',
                 }
             }
@@ -243,7 +239,7 @@ export const memberService = {
 
             if (certData.expires_at < currentTimestamp) {
                 return {
-                    resultCd: 400, // 클라이언트 에러 코드
+                    resultCd: 400,
                     resultMsg: '인증번호가 만료되었습니다.',
                 }
             }
@@ -275,27 +271,43 @@ export const memberService = {
         }
     },
 
-    async refreshAccessToken(refreshToken: string) {
+    async refreshAccessToken(userId: string) {
         try {
-            // 리프레시 토큰 검증
-            const { valid, decoded, error } = jwtUtils.verifyToken(refreshToken)
-            if (!valid) {
-                return { error: 'Invalid refresh token' }
+            // 데이터베이스에서 해당 userId의 리프레시 토큰 가져오기
+            const { data: tokenData } = await supabase.from('EM_MEMBER_REFRESH_TOKEN').select('refresh_token').eq('user_id', userId).single()
+
+            if (!tokenData) {
+                return {
+                    resultCd: 400,
+                    resultMsg: '리프레시 토큰을 찾을 수 없습니다.',
+                }
             }
 
-            // 토큰 페이로드 생성
-            const tokenPayload: TokenPayload = {
-                userId: decoded?.userId, // decoded에서 userId를 가져옵니다.
-                password: decoded?.password, // decoded에서 password를 가져옵니다.
+            // 리프레시 토큰 검증
+            const result = jwtUtils.verifyToken(tokenData.refresh_token)
+            if (result.resultCd !== 201) {
+                return result
             }
 
             // 새로운 접근 토큰 생성
+            const tokenPayload: TokenPayload = {
+                userId: userId,
+            }
+
             const newAccessToken = jwtUtils.generateTokens(tokenPayload)
 
-            return { accessToken: newAccessToken }
-        } catch (error) {
-            console.error('토큰 재발급 에러:', error)
-            return { error: 'Failed to refresh access token' }
+            return {
+                resultCd: 201,
+                resultMsg: '토큰 재발급 성공',
+                data: {
+                    accessToken: newAccessToken,
+                },
+            }
+        } catch (error: any) {
+            return {
+                resultCd: 500,
+                resultMsg: '토큰 재발급 중 오류가 발생했습니다.' + '[' + error.message + ']',
+            }
         }
     },
 }
