@@ -14,7 +14,6 @@ import {
 } from '@ant-design/icons'
 import { soMainStyles } from '../../styles/somain.styles'
 import { useNavigate } from 'react-router-dom'
-import LogoText from '../../assets/images/logo-text.png'
 
 const { Sider } = Layout
 
@@ -51,7 +50,7 @@ export default function Navigation({ containerRef }: NavigationProps) {
      */
     const MenuItems = () => {
         return menu.map((item) => (
-            <Tooltip title={siderCollapsed ? item.name : ''} placement="right">
+            <Tooltip title={siderCollapsed ? item.name : ''} placement="right" key={item.value}>
                 <div
                     className={`${soMainStyles.siderMenuItem} ${selectedMenu === item.value ? soMainStyles.menuItemSelected : ''}`}
                     onClick={() => handleMenuClick(item.value)}>

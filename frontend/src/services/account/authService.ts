@@ -1,4 +1,4 @@
-import api from '../api/axios'
+import axios from '../api/axios'
 
 /**
  * @mutation sendVerificationCode
@@ -6,7 +6,7 @@ import api from '../api/axios'
  * @description 이메일 인증 코드 전송
  */
 export const sendVerificationCode = async (email: string) => {
-    const response = await api.post('/member/emailCertSend', { userId: email })
+    const response = await axios.post('/member/emailCertSend', { userId: email })
     return response.data
 }
 
@@ -16,7 +16,7 @@ export const sendVerificationCode = async (email: string) => {
  * @description 이메일 인증 코드 확인
  */
 export const verifyCertNo = async ({ email, certNo }: { email: string; certNo: string }) => {
-    const response = await api.post('/member/emailCertCheck', { userId: email, certNo })
+    const response = await axios.post('/member/emailCertCheck', { userId: email, certNo })
     return response.data
 }
 
@@ -26,7 +26,7 @@ export const verifyCertNo = async ({ email, certNo }: { email: string; certNo: s
  * @description 회원가입
  */
 export const signup = async (data: any) => {
-    const response = await api.post('/member/signup', data)
+    const response = await axios.post('/member/signup', data)
     return response.data
 }
 
@@ -36,6 +36,6 @@ export const signup = async (data: any) => {
  * @description 로그인
  */
 export const login = async (data: any) => {
-    const response = await api.post('/member/login', data)
+    const response = await axios.post('/member/login', data)
     return response.data
 }

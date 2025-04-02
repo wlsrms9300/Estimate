@@ -90,6 +90,7 @@ export const useLogin = (onSuccess?: () => void) => {
         onSuccess: (response) => {
             if (response.resultCd === 201) {
                 // openNotification('success', '로그인 성공', response.resultMsg)
+                localStorage.setItem('at', response.data.accessToken)
                 onSuccess?.()
             } else {
                 openNotification('error', '로그인 실패', response.resultMsg)

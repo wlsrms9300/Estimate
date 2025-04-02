@@ -64,6 +64,7 @@ export const memberService = {
         // 토큰 페이로드 생성
         const tokenPayload: TokenPayload = {
             userId: data.user_id,
+            id: data.id,
         }
 
         // 토큰 생성
@@ -76,6 +77,12 @@ export const memberService = {
                 user: transformData.toCamelCase(data),
                 accessToken,
                 refreshToken,
+                cookieOptions: {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'strict',
+                    maxAge: 24 * 60 * 60 * 1000, // 24시간
+                },
             },
             0,
             201,
@@ -166,7 +173,7 @@ export const memberService = {
                     <h1>이메일 인증번호</h1>
                     <p>안녕하세요. 인증번호를 확인해주세요.</p>
                     <h2>${certNo}</h2>
-                    <p>인증번호는 30분 동안 유효합니다.</p>
+                    <p>인증번호는 5분 동안 유효합니다.</p>
                 `,
             }
 
@@ -224,45 +231,87 @@ export const memberService = {
         } catch (error) {
             return createResponse(null, 0, 500, '이메일 인증번호 인증 중 오류가 발생했습니다.' + '[' + error + ']')
         }
+        ;``
     },
 
+    // 토큰 재발급
     async refreshAccessToken(userId: string) {
         try {
             // 데이터베이스에서 해당 userId의 리프레시 토큰 가져오기
-            const { data: tokenData } = await supabase.from('EM_MEMBER_REFRESH_TOKEN').select('refresh_token').eq('user_id', userId).single()
+            const { data: tokenData } = await supabase.from('EM_MEMBER_REFRESH_TOKEN').select('refresh_token, id').eq('user_id', userId).single()
 
             if (!tokenData) {
-                return {
-                    resultCd: 400,
-                    resultMsg: '리프레시 토큰을 찾을 수 없습니다.',
-                }
-            }
-
-            // 리프레시 토큰 검증
-            const result = jwtUtils.verifyToken(tokenData.refresh_token)
-            if (result.resultCd !== 201) {
-                return result
+                return createResponse(null, 0, 400, '리프레시 토큰을 찾을 수 없습니다.')
             }
 
             // 새로운 접근 토큰 생성
             const tokenPayload: TokenPayload = {
                 userId: userId,
+                id: tokenData.id,
             }
 
-            const newAccessToken = jwtUtils.generateTokens(tokenPayload)
+            const { accessToken } = jwtUtils.generateTokens(tokenPayload)
 
-            return {
-                resultCd: 201,
-                resultMsg: '토큰 재발급 성공',
-                data: {
-                    accessToken: newAccessToken,
+            return createResponse(
+                {
+                    accessToken,
                 },
-            }
+                0,
+                201,
+                '토큰 재발급 성공',
+            )
         } catch (error: any) {
-            return {
-                resultCd: 500,
-                resultMsg: '토큰 재발급 중 오류가 발생했습니다.' + '[' + error.message + ']',
-            }
+            return createResponse(null, 0, 500, '토큰 재발급 중 오류가 발생했습니다.' + '[' + error.message + ']')
         }
     },
+
+    // // 프로필 조회
+    // async getProfile(userId: string) {
+    //     try {
+    //         const { data, error } = await supabase.from('EM_MEMBER').select('*').eq('user_id', userId).single()
+
+    //         if (error) {
+    //             return createResponse(null, 0, 500, '프로필 조회 중 오류가 발생했습니다.' + '[' + error.message + ']')
+    //         }
+
+    //         return createResponse(transformData.toCamelCase(data), 0, 201, '프로필 조회 성공')
+    //     } catch (error: any) {
+    //         return createResponse(null, 0, 500, '프로필 조회 중 오류가 발생했습니다.' + '[' + error.message + ']')
+    //     }
+    // },
+
+    // // 프로필 수정
+    // async updateProfile(userId: string, updateData: any) {
+    //     try {
+    //         const { data, error } = await supabase
+    //             .from('EM_MEMBER')
+    //             .update(transformData.toSnakeCase(updateData))
+    //             .eq('user_id', userId)
+    //             .select()
+    //             .single()
+
+    //         if (error) {
+    //             return createResponse(null, 0, 500, '프로필 수정 중 오류가 발생했습니다.' + '[' + error.message + ']')
+    //         }
+
+    //         return createResponse(transformData.toCamelCase(data), 0, 201, '프로필 수정 성공')
+    //     } catch (error: any) {
+    //         return createResponse(null, 0, 500, '프로필 수정 중 오류가 발생했습니다.' + '[' + error.message + ']')
+    //     }
+    // },
+
+    // // 프로필 삭제
+    // async deleteProfile(userId: string) {
+    //     try {
+    //         const { error } = await supabase.from('EM_MEMBER').delete().eq('user_id', userId)
+
+    //         if (error) {
+    //             return createResponse(null, 0, 500, '프로필 삭제 중 오류가 발생했습니다.' + '[' + error.message + ']')
+    //         }
+
+    //         return createResponse(null, 0, 201, '프로필 삭제 성공')
+    //     } catch (error: any) {
+    //         return createResponse(null, 0, 500, '프로필 삭제 중 오류가 발생했습니다.' + '[' + error.message + ']')
+    //     }
+    // },
 }

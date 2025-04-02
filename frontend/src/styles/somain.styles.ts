@@ -19,4 +19,5 @@ export const soMainStyles = {
     headerIcons: 'flex items-center space-x-6',
     headerIcon: 'text-2xl text-gray-700 hover:text-[#00c4cc] transition-colors cursor-pointer',
     content: '!mt-[10px] !mr-[10px] !flex-1 !overflow-auto bg-white rounded-t-xl shadow-lg border border-gray-100 !h-[calc(100vh-100px)]',
+    contentWrapper: 'h-full overflow-auto',
 }
