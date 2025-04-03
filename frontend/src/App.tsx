@@ -11,6 +11,7 @@ const Introduce = lazy(() => import('./pages/Introduce'))
 const MainLayout = lazy(() => import('./pages/MainLayout'))
 const AuthExpire = lazy(() => import('./pages/AuthExpire'))
 const EstimateMenu = lazy(() => import('./components/content/EstimateMenu'))
+const ProfileEdit = lazy(() => import('./components/profile/ProfileEdit'))
 
 // auth
 import PrivateRoute from './components/auth/PrivateRoute'
@@ -59,6 +60,7 @@ function MyApp() {
                                     <Route element={<PrivateRoute />}>
                                         <Route path="/so" element={<MainLayout />}>
                                             <Route path="estimate" element={<EstimateMenu />} />
+                                            <Route path="profile" element={<ProfileEdit />} />
                                         </Route>
                                     </Route>
                                 </Routes>

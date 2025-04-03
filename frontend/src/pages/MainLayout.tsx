@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { Layout, Dropdown, MenuProps, Flex } from 'antd'
-import { UserOutlined, BellOutlined, LoadingOutlined } from '@ant-design/icons'
+import { UserOutlined, BellOutlined, LoadingOutlined, LogoutOutlined } from '@ant-design/icons'
 import { soMainStyles } from '../styles/somain.styles'
 //components
 import Navigation from '../components/layout/Navigation'
@@ -12,30 +12,24 @@ const { Header, Content } = Layout
 
 export default function MainLayout() {
     const containerRef = useRef<HTMLDivElement>(null)
+    const contentAreaRef = useRef<HTMLDivElement>(null)
     const navigate = useNavigate()
+    const [isLoading, setIsLoading] = useState(false)
+    const [isScrolled, setIsScrolled] = useState(false)
+
     const items: MenuProps['items'] = [
-        // {
-        //     label: '사용자명',
-        //     type: 'group',
-        //     key: 'group',
-        //     children: [
-        //         {
-        //             label: '내정보',
-        //             key: 'profile',
-        //         },
-        //         {
-        //             label: '로그아웃',
-        //             key: 'logout',
-        //         },
-        //     ],
-        // },
         {
             label: '내정보',
             key: 'profile',
+            icon: <UserOutlined />,
+        },
+        {
+            type: 'divider',
         },
         {
             label: '로그아웃',
             key: 'logout',
+            icon: <LogoutOutlined />,
         },
     ]
 
@@ -46,15 +40,44 @@ export default function MainLayout() {
     const onClickHandler: MenuProps['onClick'] = ({ key }) => {
         switch (key) {
             case 'profile':
-                alert('내정보 화면으로 이동')
+                navigate('/so/profile')
                 break
             case 'logout':
-                localStorage.removeItem('at')
-                resetAllStores()
-                navigate('/')
+                setIsLoading(true)
+                setTimeout(() => {
+                    localStorage.removeItem('at')
+                    resetAllStores()
+                    navigate('/')
+                    setIsLoading(false)
+                }, 1000)
                 break
         }
     }
+
+    const handleScroll = useCallback(() => {
+        if (contentAreaRef.current) {
+            const scrollTop = contentAreaRef.current.scrollTop
+            const isScrolledNow = scrollTop > 0
+
+            if (isScrolledNow !== isScrolled) {
+                setIsScrolled(isScrolledNow)
+            }
+        }
+    }, [isScrolled])
+
+    useEffect(() => {
+        const contentElement = contentAreaRef.current
+        if (contentElement) {
+            // 초기 스크롤 상태 확인
+            handleScroll()
+
+            contentElement.addEventListener('scroll', handleScroll, { passive: true })
+
+            return () => {
+                contentElement.removeEventListener('scroll', handleScroll)
+            }
+        }
+    }, [handleScroll])
 
     return (
         <Layout ref={containerRef} className={soMainStyles.layout}>
@@ -62,7 +85,7 @@ export default function MainLayout() {
             <div className={soMainStyles.layoutContainer}>
                 <Layout className={soMainStyles.innerLayout}>
                     <Content className={soMainStyles.content}>
-                        <Header className={soMainStyles.header}>
+                        <Header className={`${soMainStyles.header} ${isScrolled ? soMainStyles.headerScrolled : ''}`}>
                             <div className={soMainStyles.headerTitle}></div>
                             <div className={soMainStyles.headerIcons}>
                                 <BellOutlined className={soMainStyles.headerIcon} />
@@ -77,7 +100,15 @@ export default function MainLayout() {
                                 </Dropdown>
                             </div>
                         </Header>
-                        <Outlet />
+                        <div
+                            ref={contentAreaRef}
+                            className={soMainStyles.contentArea}
+                            style={{
+                                height: 'calc(100vh - 77px)',
+                                overflowY: 'auto',
+                            }}>
+                            <Outlet />
+                        </div>
                     </Content>
                 </Layout>
             </div>

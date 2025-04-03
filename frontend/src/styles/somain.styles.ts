@@ -14,10 +14,12 @@ export const soMainStyles = {
     sliderIcon: 'text-lg text-[#8b3dff]',
     sliderCollapseButtonText: 'ml-3 overflow-hidden whitespace-nowrap',
     innerLayout: '!h-full !bg-transparent',
-    header: '!bg-transparent !py-2 !px-6 !flex !items-center !justify-end',
+    header: '!bg-white !py-2 !px-6 !flex !items-center !justify-end !sticky !top-0 !z-10 !transition-all !duration-300',
+    headerScrolled: '!shadow-lg !bg-white/95 !backdrop-blur-md',
     headerTitle: 'text-2xl font-medium text-gray-800',
     headerIcons: 'flex items-center space-x-6',
     headerIcon: 'text-2xl text-gray-700 hover:text-[#00c4cc] transition-colors cursor-pointer',
     content: '!mt-[10px] !mr-[10px] !flex-1 !overflow-auto bg-white rounded-t-xl shadow-lg border border-gray-100 !h-[calc(100vh-100px)]',
+    contentArea: 'p-4 h-full overflow-auto',
     contentWrapper: 'h-full overflow-auto',
 }
