@@ -2,6 +2,8 @@ import { useState, ReactNode } from 'react'
 import { Form, Input, Button, message, Layout, Typography, Divider } from 'antd'
 import { UserOutlined, MailOutlined, PhoneOutlined, GlobalOutlined, EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
 import { profileStyles } from '../../styles/content/profile.styles'
+import { validateEmail, validatePhone } from '../../utils/validation'
+import type { Rule } from 'antd/es/form'
 
 const { Title, Text } = Typography
 
@@ -9,16 +11,12 @@ interface ProfileData {
     name: string
     email: string
     phone: string
-    company: string
-    bio: string
 }
 
 const initialProfileData: ProfileData = {
     name: '홍길동',
     email: 'hong@example.com',
     phone: '010-1234-5678',
-    company: 'BizSync',
-    bio: '안녕하세요. 저는 비즈니스 자동화에 관심이 많은 개발자입니다.',
 }
 
 const ProfileEdit = () => {
@@ -60,8 +58,6 @@ const ProfileEdit = () => {
             name: '이름',
             email: '이메일',
             phone: '휴대폰번호',
-            company: '회사',
-            bio: '소개',
         }
         return labels[field] || field
     }
@@ -72,7 +68,6 @@ const ProfileEdit = () => {
             name: <UserOutlined />,
             email: <MailOutlined />,
             phone: <PhoneOutlined />,
-            company: <GlobalOutlined />,
         }
         return icons[field] || null
     }
@@ -80,7 +75,32 @@ const ProfileEdit = () => {
     // 정보 항목 컴포넌트
     const InfoItem = ({ field, icon }: { field: keyof ProfileData; icon?: ReactNode }) => {
         const isEditing = editingField === field
-        const isBio = field === 'bio'
+
+        const getValidationRules = (field: keyof ProfileData): Rule[] => {
+            const rules: Rule[] = [{ required: true, message: `${getFieldLabel(field)}을(를) 입력해주세요` }]
+
+            if (field === 'email') {
+                rules.push({
+                    validator: async (_: any, value: string) => {
+                        if (value && !validateEmail(value)) {
+                            throw new Error('올바른 이메일 형식이 아닙니다')
+                        }
+                    },
+                })
+            }
+
+            if (field === 'phone') {
+                rules.push({
+                    validator: async (_: any, value: string) => {
+                        if (value && !validatePhone(value)) {
+                            throw new Error('올바른 휴대폰 번호 형식이 아닙니다 (예: 010-1234-5678)')
+                        }
+                    },
+                })
+            }
+
+            return rules
+        }
 
         return (
             <>
@@ -89,26 +109,16 @@ const ProfileEdit = () => {
                         <Text className={profileStyles.infoLabel}>{getFieldLabel(field)}</Text>
                         <div className={profileStyles.valueContainer}>
                             {isEditing ? (
-                                <Form.Item
-                                    name={field}
-                                    className="mb-0"
-                                    rules={[{ required: true, message: `${getFieldLabel(field)}을(를) 입력해주세요` }]}>
-                                    {isBio ? (
-                                        <Input.TextArea
-                                            rows={3}
-                                            placeholder={`${getFieldLabel(field)}을(를) 입력하세요`}
-                                            className={profileStyles.textArea}
-                                        />
-                                    ) : (
-                                        <Input
-                                            prefix={icon}
-                                            placeholder={`${getFieldLabel(field)}을(를) 입력하세요`}
-                                            className={profileStyles.input}
-                                        />
-                                    )}
+                                <Form.Item name={field} className="mb-0" rules={getValidationRules(field)}>
+                                    <Input
+                                        type={field === 'email' ? 'email' : 'number'}
+                                        prefix={icon}
+                                        placeholder={`${getFieldLabel(field)}을(를) 입력하세요`}
+                                        className={profileStyles.input}
+                                    />
                                 </Form.Item>
                             ) : (
-                                <div className={isBio ? profileStyles.bioValue : profileStyles.infoValue}>{profileData[field]}</div>
+                                <div className={profileStyles.infoValue}>{profileData[field]}</div>
                             )}
                         </div>
                     </div>
