@@ -1,8 +1,9 @@
-import { useState, ReactNode } from 'react'
+import { useState, ReactNode, useEffect } from 'react'
 import { Form, Input, Button, message, Layout, Typography, Divider } from 'antd'
 import { UserOutlined, MailOutlined, PhoneOutlined, GlobalOutlined, EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
 import { profileStyles } from '../../styles/content/profile.styles'
 import { validateEmail, validatePhone } from '../../utils/validation'
+import { useGetProfile } from '../../hooks/account/authService'
 import type { Rule } from 'antd/es/form'
 
 const { Title, Text } = Typography
@@ -14,12 +15,13 @@ interface ProfileData {
 }
 
 const initialProfileData: ProfileData = {
-    name: '홍길동',
-    email: 'hong@example.com',
-    phone: '010-1234-5678',
+    name: '',
+    email: '',
+    phone: '',
 }
 
 const ProfileEdit = () => {
+    const { data: profile } = useGetProfile()
     const [form] = Form.useForm()
     const [profileData, setProfileData] = useState<ProfileData>(initialProfileData)
     const [editingField, setEditingField] = useState<string | null>(null)
@@ -118,7 +120,9 @@ const ProfileEdit = () => {
                                     />
                                 </Form.Item>
                             ) : (
-                                <div className={profileStyles.infoValue}>{profileData[field]}</div>
+                                <div className={profileData[field] ? profileStyles.infoValue : profileStyles.emptyValue}>
+                                    {profileData[field] || '미등록'}
+                                </div>
                             )}
                         </div>
                     </div>
@@ -149,6 +153,16 @@ const ProfileEdit = () => {
         )
     }
 
+    useEffect(() => {
+        if (profile) {
+            setProfileData({
+                name: profile.userName,
+                email: profile.userId,
+                phone: profile.userPhone,
+            })
+        }
+    }, [profile])
+
     return (
         <Layout className={profileStyles.container}>
             <Title level={2} className={profileStyles.title}>
@@ -159,8 +173,8 @@ const ProfileEdit = () => {
 
             <Form form={form} className={profileStyles.form}>
                 <div className={profileStyles.infoSection}>
-                    <InfoItem field="name" icon={<UserOutlined />} />
                     <InfoItem field="email" icon={<MailOutlined />} />
+                    <InfoItem field="name" icon={<UserOutlined />} />
                     <InfoItem field="phone" icon={<PhoneOutlined />} />
                 </div>
             </Form>

@@ -5,15 +5,14 @@ import { authMiddleware } from '../middleware/auth.middleware'
 const router = express.Router()
 
 // 인증이 필요하지 않은 라우트
-router.post('/signup', memberController.signup as RequestHandler)
-router.post('/login', memberController.login as RequestHandler)
-router.post('/emailCertSend', memberController.emailCertSend as RequestHandler)
-router.post('/emailCertCheck', memberController.emailCertCheck as RequestHandler)
-router.post('/refreshToken', memberController.refreshToken as RequestHandler)
+router.post('/signup', memberController.signup as RequestHandler) //회원가입
+router.post('/login', memberController.login as RequestHandler) //로그인
+router.post('/emailCertSend', memberController.emailCertSend as RequestHandler) //이메일 인증코드 발송
+router.post('/emailCertCheck', memberController.emailCertCheck as RequestHandler) //이메일 인증코드 확인
+router.post('/refreshToken', memberController.refreshToken as RequestHandler) //토큰 재발급
 
 // 인증이 필요한 라우트
-// router.get('/profile', authMiddleware, memberController.getProfile as RequestHandler)
-// router.put('/profile', authMiddleware, memberController.updateProfile as RequestHandler)
-// router.delete('/profile', authMiddleware, memberController.deleteProfile as RequestHandler)
+router.get('/profile', authMiddleware, memberController.getProfile as RequestHandler) //회원정보 조회
+router.put('/profile', authMiddleware, memberController.updateProfile as RequestHandler) //회원정보 수정
 
 export default router

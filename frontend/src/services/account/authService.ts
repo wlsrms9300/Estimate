@@ -39,3 +39,13 @@ export const login = async (data: any) => {
     const response = await axios.post('/member/login', data)
     return response.data
 }
+
+/**
+ * @mutation getProfile
+ * @get /member/profile
+ * @description 프로필 조회
+ */
+export const getProfile = async () => {
+    const response = await axios.get('/member/profile')
+    return response.data
+}

@@ -273,40 +273,50 @@ export const memberService = {
         }
     },
 
-    // // 프로필 조회
-    // async getProfile(userId: string) {
-    //     try {
-    //         const { data, error } = await supabase.from('EM_MEMBER').select('*').eq('user_id', userId).single()
+    // 프로필 조회
+    async getProfile(id: string) {
+        try {
+            const { data, error } = await supabase.from('EM_MEMBER').select('*').eq('id', id).single()
 
-    //         if (error) {
-    //             return createResponse(null, 0, 500, '프로필 조회 중 오류가 발생했습니다.' + '[' + error.message + ']')
-    //         }
+            if (error) {
+                return createResponse(null, 0, 500, '프로필 조회 중 오류가 발생했습니다.' + '[' + error.message + ']')
+            }
 
-    //         return createResponse(transformData.toCamelCase(data), 0, 201, '프로필 조회 성공')
-    //     } catch (error: any) {
-    //         return createResponse(null, 0, 500, '프로필 조회 중 오류가 발생했습니다.' + '[' + error.message + ']')
-    //     }
-    // },
+            return createResponse(
+                transformData.toCamelCase({
+                    user_id: data.user_id,
+                    id: data.id,
+                    user_name: data.user_name,
+                    user_phone: data.user_phone,
+                }),
+                0,
+                201,
+                '프로필 조회 성공',
+            )
+        } catch (error: any) {
+            return createResponse(null, 0, 500, '프로필 조회 중 오류가 발생했습니다.' + '[' + error.message + ']')
+        }
+    },
 
-    // // 프로필 수정
-    // async updateProfile(userId: string, updateData: any) {
-    //     try {
-    //         const { data, error } = await supabase
-    //             .from('EM_MEMBER')
-    //             .update(transformData.toSnakeCase(updateData))
-    //             .eq('user_id', userId)
-    //             .select()
-    //             .single()
+    // 프로필 수정
+    async updateProfile(userId: string, updateData: any) {
+        try {
+            const { data, error } = await supabase
+                .from('EM_MEMBER')
+                .update(transformData.toSnakeCase(updateData))
+                .eq('user_id', userId)
+                .select()
+                .single()
 
-    //         if (error) {
-    //             return createResponse(null, 0, 500, '프로필 수정 중 오류가 발생했습니다.' + '[' + error.message + ']')
-    //         }
+            if (error) {
+                return createResponse(null, 0, 500, '프로필 수정 중 오류가 발생했습니다.' + '[' + error.message + ']')
+            }
 
-    //         return createResponse(transformData.toCamelCase(data), 0, 201, '프로필 수정 성공')
-    //     } catch (error: any) {
-    //         return createResponse(null, 0, 500, '프로필 수정 중 오류가 발생했습니다.' + '[' + error.message + ']')
-    //     }
-    // },
+            return createResponse(transformData.toCamelCase(data), 0, 201, '프로필 수정 성공')
+        } catch (error: any) {
+            return createResponse(null, 0, 500, '프로필 수정 중 오류가 발생했습니다.' + '[' + error.message + ']')
+        }
+    },
 
     // // 프로필 삭제
     // async deleteProfile(userId: string) {

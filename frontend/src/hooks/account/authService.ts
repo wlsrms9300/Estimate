@@ -1,5 +1,5 @@
-import { useMutation } from '@tanstack/react-query'
-import { sendVerificationCode, verifyCertNo, signup, login } from '../../services/account/authService'
+import { useMutation, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { sendVerificationCode, verifyCertNo, signup, login, getProfile } from '../../services/account/authService'
 import useCustomNotification from '../notification'
 import { SHA256 } from 'crypto-js'
 import { SignupForm, LoginForm } from '../../types/account/auth'
@@ -26,7 +26,7 @@ export const useSendVerificationCode = (onSuccess?: (step?: number) => void) => 
             }
         },
         onError: (error: any) => {
-            openNotification('error', '이메일 인증코드 발송 실패', error.response.data.resultMsg)
+            openNotification('error', '이메일 인증코드 발송 실패', error.response?.data?.resultMsg)
         },
     })
 }
@@ -50,7 +50,7 @@ export const useVerifyCertNo = (onSuccess?: () => void) => {
             }
         },
         onError: (error: any) => {
-            openNotification('error', '인증코드 확인 실패', error.response.data.resultMsg)
+            openNotification('error', '인증코드 확인 실패', error.response?.data?.resultMsg)
         },
     })
 }
@@ -78,7 +78,7 @@ export const useSignup = (onSuccess?: () => void) => {
             }
         },
         onError: (error: any) => {
-            openNotification('error', '회원가입 실패', error.response.data.resultMsg)
+            openNotification('error', '회원가입 실패', error.response?.data?.resultMsg)
         },
     })
 }
@@ -107,7 +107,32 @@ export const useLogin = (onSuccess?: () => void) => {
             }
         },
         onError: (error: any) => {
-            openNotification('error', '로그인 실패', error.response.data.resultMsg)
+            openNotification('error', '로그인 실패', error.response?.data?.resultMsg)
         },
+    })
+}
+
+/**
+ * @query useGetProfile
+ * @get /member/profile
+ * @description 프로필 조회
+ */
+export const useGetProfile = () => {
+    const { openNotification } = useCustomNotification()
+
+    return useQuery({
+        queryKey: ['profile'],
+        queryFn: async () => {
+            try {
+                const response = await getProfile()
+                return response?.data
+            } catch (error: any) {
+                openNotification('error', '프로필 조회 실패', error.response?.data?.resultMsg)
+                throw error
+            }
+        },
+        // staleTime: 5 * 60 * 1000, // 5분 동안 데이터를 신선하게 유지
+        // retry: 3, // 실패 시 3번까지 재시도
+        // refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 리프레시 비활성화
     })
 }

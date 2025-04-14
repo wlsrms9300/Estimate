@@ -8,6 +8,7 @@ export const profileStyles = {
     infoItem: 'flex justify-between items-center py-3',
     infoLabel: 'text-gray-500 font-medium text-sm mb-1',
     infoValue: 'text-gray-800 font-medium text-lg h-10 flex items-center',
+    emptyValue: 'text-gray-300 font-medium text-lg h-10 flex items-center',
     bioValue: 'text-gray-800 font-medium text-lg min-h-[74px] py-2 flex-col items-start justify-center',
     valueContainer: 'flex flex-col justify-center',
     infoEditButton: 'border border-[#6366f1] text-[#6366f1] hover:text-[#4f46e5] hover:border-[#4f46e5]',
