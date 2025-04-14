@@ -16,6 +16,12 @@ export const profileStyles = {
     editCancelButton: 'border border-gray-300 text-gray-600',
     editSaveButton: '!bg-[#6366f1] !text-white hover:!bg-[#4f46e5]',
     input: 'h-10 rounded-lg w-full max-w-sm',
+    inputError:
+        'h-10 rounded-lg w-full max-w-sm !border-red-500 hover:!border-red-500 focus:!border-red-500 focus:!shadow-[0_0_0_2px_rgba(239,68,68,0.1)]',
     textArea: 'min-h-[74px] rounded-lg',
     divider: 'my-0 border-gray-200',
+    formItemError:
+        '[&_.ant-form-item-explain-error]:!text-[12px] [&_.ant-form-item-explain-error]:!text-red-500 [&_.ant-form-item-explain-error]:!ml-2.5 [&_.ant-form-item-explain-error]:!mt-1',
+    formItem: '[&_.ant-form-item-label]:!text-gray-500 [&_.ant-form-item-label]:!text-sm [&_.ant-form-item-label]:!mb-1',
+    inputLarge: '!h-10 !rounded-xl !w-full !max-w-sm',
 }

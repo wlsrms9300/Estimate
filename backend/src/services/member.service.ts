@@ -299,14 +299,9 @@ export const memberService = {
     },
 
     // 프로필 수정
-    async updateProfile(userId: string, updateData: any) {
+    async updateProfile(id: string, updateData: any) {
         try {
-            const { data, error } = await supabase
-                .from('EM_MEMBER')
-                .update(transformData.toSnakeCase(updateData))
-                .eq('user_id', userId)
-                .select()
-                .single()
+            const { data, error } = await supabase.from('EM_MEMBER').update(transformData.toSnakeCase(updateData)).eq('id', id).select().single()
 
             if (error) {
                 return createResponse(null, 0, 500, '프로필 수정 중 오류가 발생했습니다.' + '[' + error.message + ']')
