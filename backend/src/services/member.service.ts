@@ -179,7 +179,15 @@ export const memberService = {
 
             await transporter.sendMail(mailOptions)
 
-            return createResponse(null, 0, 201, '인증번호가 이메일로 발송되었습니다.')
+            return createResponse(
+                {
+                    userId: userId,
+                    certNo: certNo,
+                },
+                0,
+                201,
+                '인증번호가 이메일로 발송되었습니다.',
+            )
         } catch (error) {
             return createResponse(null, 0, 500, '이메일 인증번호 발송 중 오류가 발생했습니다.' + '[' + error + ']')
         }

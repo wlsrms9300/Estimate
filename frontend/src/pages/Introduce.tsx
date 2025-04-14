@@ -22,7 +22,7 @@ export default function Introduce() {
                 <div className={introduceStyles.headerContent}>
                     <div className={introduceStyles.logo}>BizSync</div>
                     <nav className={introduceStyles.nav}>
-                        <a className={introduceStyles.navLink}>요금제</a>
+                        {/* <a className={introduceStyles.navLink}>요금제</a> */}
                         <a className={introduceStyles.navLink}>고객지원</a>
                         <Button onClick={() => setIsModalOpen(true)} className={introduceStyles.primaryButton}>
                             시작하기

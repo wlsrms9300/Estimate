@@ -33,7 +33,7 @@ const queryClient = new QueryClient({
                 console.log('Mutation settled:', data)
             },
             onError: (error: any) => {
-                console.error('Mutation failed:', error)
+                // console.error('Mutation failed:', error)
             },
         },
     },

@@ -17,12 +17,16 @@ export const useSendVerificationCode = (onSuccess?: (step?: number) => void) => 
         onSuccess: (response) => {
             if (response.resultCd === 201) {
                 if (response.code !== 10000) {
+                    alert('인증번호: ' + response.data.certNo)
                     openNotification('success', '이메일 인증코드 발송', response.resultMsg)
                 }
                 onSuccess?.(response.code === 10000 ? 5 : 0)
             } else {
                 openNotification('error', '이메일 인증코드 발송 실패', '이메일을 확인해 주세요.')
             }
+        },
+        onError: (error: any) => {
+            openNotification('error', '이메일 인증코드 발송 실패', error.response.data.resultMsg)
         },
     })
 }
@@ -44,6 +48,9 @@ export const useVerifyCertNo = (onSuccess?: () => void) => {
             } else {
                 openNotification('error', '인증코드 확인 실패', '인증코드를 확인 해주세요.')
             }
+        },
+        onError: (error: any) => {
+            openNotification('error', '인증코드 확인 실패', error.response.data.resultMsg)
         },
     })
 }
@@ -70,6 +77,9 @@ export const useSignup = (onSuccess?: () => void) => {
                 openNotification('error', '회원가입 실패', '회원정보를 확인 해주세요.')
             }
         },
+        onError: (error: any) => {
+            openNotification('error', '회원가입 실패', error.response.data.resultMsg)
+        },
     })
 }
 
@@ -95,6 +105,9 @@ export const useLogin = (onSuccess?: () => void) => {
             } else {
                 openNotification('error', '로그인 실패', response.resultMsg)
             }
+        },
+        onError: (error: any) => {
+            openNotification('error', '로그인 실패', error.response.data.resultMsg)
         },
     })
 }

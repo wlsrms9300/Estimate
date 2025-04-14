@@ -4,6 +4,8 @@ import {
     FormOutlined,
     DollarCircleOutlined,
     DollarCircleFilled,
+    SettingOutlined,
+    SettingFilled,
     FolderOpenOutlined,
     FolderOpenFilled,
     MenuOutlined,
@@ -26,10 +28,11 @@ export default function Navigation({ containerRef }: NavigationProps) {
     const [siderCollapsed, setSiderCollapsed] = useState(false)
     const [selectedMenu, setSelectedMenu] = useState('')
     const menu = [
-        { name: '서류함', icon: <FolderOpenOutlined />, selIcon: <FolderOpenFilled />, value: 'documents' },
-        { name: '요금제', icon: <DollarCircleOutlined />, selIcon: <DollarCircleFilled />, value: 'plan' },
-        { name: '업체 관리', icon: <ProductOutlined />, selIcon: <ProductFilled />, value: 'company' },
-        { name: '공지사항', icon: <NotificationOutlined />, selIcon: <NotificationFilled />, value: 'notice' },
+        { name: '견적서', icon: <FolderOpenOutlined />, selIcon: <FolderOpenFilled />, value: 'documents' },
+        // { name: '요금제', icon: <DollarCircleOutlined />, selIcon: <DollarCircleFilled />, value: 'plan' },
+        { name: '거래처', icon: <ProductOutlined />, selIcon: <ProductFilled />, value: 'customer' },
+        { name: '업체', icon: <ProductOutlined />, selIcon: <ProductFilled />, value: 'company' },
+        { name: '설정', icon: <SettingOutlined />, selIcon: <SettingFilled />, value: 'setting' },
     ]
 
     /**

@@ -26,6 +26,22 @@ export const SignModal = ({ isModalOpen, handleCancel }: SignModalProps) => {
     }, [])
 
     /**
+     * @function handleKakaoStart
+     * @description 카카오 시작 버튼 클릭 시 이벤트
+     */
+    const handleKakaoStart = useCallback(() => {
+        alert('카카오 로그인(예정)')
+    }, [])
+
+    /**
+     * @function handleNaverStart
+     * @description 네이버 시작 버튼 클릭 시 이벤트
+     */
+    const handleNaverStart = useCallback(() => {
+        alert('네이버 로그인(예정)')
+    }, [])
+
+    /**
      * @function handlePrev
      * @description 이전 버튼 클릭 시 이벤트
      */
@@ -62,7 +78,7 @@ export const SignModal = ({ isModalOpen, handleCancel }: SignModalProps) => {
 
     return (
         <Modal className="!w-[420px]" title="" footer={<></>} open={isModalOpen} onCancel={handleCancel}>
-            {step === 0 && <StartType handleEmail={handleEmailStart} />}
+            {step === 0 && <StartType handleEmail={handleEmailStart} handleKakao={handleKakaoStart} handleNaver={handleNaverStart} />}
             {step === 1 && <StepEmail handlePrev={handlePrev} handleNext={handleNext} />}
             {step === 2 && <StepAuthCode handlePrev={handlePrev} handleNext={handleNext} />}
             {step === 3 && <StepPassword handlePrev={handlePrev} handleNext={handleNext} />}
