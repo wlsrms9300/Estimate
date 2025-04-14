@@ -35,10 +35,19 @@
 
 -   Apidog
 
-## 규칙
+## .env.development 파일 테스트용 (FRONTEND)
 
--   Backend
+-   VITE_API_URL=http://localhost:3000
 
-    -   API Success Response status GET:200, POST/DELETE:201
+## .env 파일 테스트용 (BACKEND)
 
--   Frontend
+-   PORT=3000
+-   JWT_SECRET_KEY=secret
+-   SUPABASE_URL=https://vrwnysaepdxyuesavyuk.supabase.co
+-   SUPABASE_ANON_KEY=
+    eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyd255c2FlcGR4eXVlc2F2eXVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIyNzc2MTksImV4cCI6MjA1Nzg1MzYxOX0.d_x-G2YZvoNkBsmgMrcR8mswRaM0bUO6omAghvtOLkY
+-   MAIL_HOST=sandbox.smtp.mailtrap.io
+-   MAIL_PORT=2525
+-   MAIL_USER=084e3fd172a660
+-   MAIL_PASS=31bd96ee444778
+-   MAIL_FROM=test@estimate.com
