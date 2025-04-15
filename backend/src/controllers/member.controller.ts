@@ -26,7 +26,7 @@ export const memberController = {
                     // refresh token을 쿠키로 설정
                     res.cookie('refreshToken', refreshToken, {
                         ...cookieOptions,
-                        sameSite: cookieOptions.sameSite as 'strict' | 'lax' | 'none',
+                        sameSite: cookieOptions.sameSite,
                     })
 
                     result.data = rest

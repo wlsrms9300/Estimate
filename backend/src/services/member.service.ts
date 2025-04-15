@@ -246,7 +246,19 @@ export const memberService = {
     async refreshAccessToken(userId: string) {
         try {
             // 데이터베이스에서 해당 userId의 리프레시 토큰 가져오기
-            const { data: tokenData } = await supabase.from('EM_MEMBER_REFRESH_TOKEN').select('refresh_token, id').eq('user_id', userId).single()
+            const { data: tokenData } = await supabase
+                .from('EM_MEMBER_REFRESH_TOKEN')
+                .select(
+                    `
+                    refresh_token,
+                    id,
+                    em_member!inner (
+                        id
+                    )
+                `,
+                )
+                .eq('user_id', userId)
+                .single()
 
             if (!tokenData) {
                 return createResponse(null, 0, 400, '리프레시 토큰을 찾을 수 없습니다.')
@@ -255,7 +267,7 @@ export const memberService = {
             // 새로운 접근 토큰 생성
             const tokenPayload: TokenPayload = {
                 userId: userId,
-                id: tokenData.id,
+                id: Number((tokenData.em_member as any as { id: string }).id),
             }
 
             const { accessToken } = jwtUtils.generateTokens(tokenPayload)
@@ -276,6 +288,7 @@ export const memberService = {
     // 프로필 조회
     async getProfile(id: string) {
         try {
+            console.log(id)
             const { data, error } = await supabase.from('EM_MEMBER').select('*').eq('id', id).single()
 
             if (error) {
