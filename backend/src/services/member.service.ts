@@ -288,7 +288,6 @@ export const memberService = {
     // 프로필 조회
     async getProfile(id: string) {
         try {
-            console.log(id)
             const { data, error } = await supabase.from('EM_MEMBER').select('*').eq('id', id).single()
 
             if (error) {
@@ -320,7 +319,7 @@ export const memberService = {
                 return createResponse(null, 0, 500, '프로필 수정 중 오류가 발생했습니다.' + '[' + error.message + ']')
             }
 
-            return createResponse(transformData.toCamelCase(data), 0, 201, '프로필 수정 성공')
+            return createResponse(null, 0, 201, '프로필 수정 성공')
         } catch (error: any) {
             return createResponse(null, 0, 500, '프로필 수정 중 오류가 발생했습니다.' + '[' + error.message + ']')
         }

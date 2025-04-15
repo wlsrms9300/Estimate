@@ -13,6 +13,6 @@ router.post('/refreshToken', memberController.refreshToken as RequestHandler) //
 
 // 인증이 필요한 라우트
 router.get('/profile', authMiddleware, memberController.getProfile as RequestHandler) //회원정보 조회
-router.put('/profile', authMiddleware, memberController.updateProfile as RequestHandler) //회원정보 수정
+router.post('/profile', authMiddleware, memberController.updateProfile as RequestHandler) //회원정보 수정
 
 export default router

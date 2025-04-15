@@ -41,11 +41,21 @@ export const login = async (data: any) => {
 }
 
 /**
- * @mutation getProfile
+ * @query getProfile
  * @get /member/profile
  * @description 프로필 조회
  */
 export const getProfile = async () => {
     const response = await axios.get('/member/profile')
+    return response.data
+}
+
+/**
+ * @mutation updateProfile
+ * @post /member/profile
+ * @description 프로필 수정
+ */
+export const updateProfile = async (data: any) => {
+    const response = await axios.post('/member/profile', data)
     return response.data
 }

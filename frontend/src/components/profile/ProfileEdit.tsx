@@ -1,52 +1,67 @@
-import { useState, ReactNode } from 'react'
-import { Form, Input, Button, message, Layout, Typography, Divider } from 'antd'
-import { UserOutlined, MailOutlined, PhoneOutlined, EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
-import { useForm, Controller } from 'react-hook-form'
+import { useState } from 'react'
+import { message, Layout, Typography } from 'antd'
 import { profileStyles } from '../../styles/content/profile.styles'
 import { validateEmail, validatePhone } from '../../utils/validation'
-import { useGetProfile } from '../../hooks/account/authService'
+import { useGetProfile, useUpdateProfile } from '../../hooks/account/authService'
+import { useQueryClient } from '@tanstack/react-query'
+
 // components
 import InfoItem from './InfoItem'
 
-const { Title, Text } = Typography
-
 interface ProfileData {
-    name: string
+    userName: string
     email: string
-    phone: string
+    userPhone: string
 }
 
 export default function ProfileEdit() {
+    const queryClient = useQueryClient()
     const { data: profile } = useGetProfile()
     const [editingField, setEditingField] = useState<keyof ProfileData | null>(null)
 
-    const handleSave = async (field: keyof ProfileData, value: string) => {
-        try {
-            if (field === 'email' && !validateEmail(value)) {
-                message.error('올바른 이메일 형식이 아닙니다')
-                return
-            }
-            if (field === 'phone' && !validatePhone(value)) {
-                message.error('올바른 휴대폰 번호 형식이 아닙니다')
-                return
-            }
+    const { mutate: updateProfile } = useUpdateProfile()
 
-            // 모의 API 호출
-            await new Promise((resolve) => setTimeout(resolve, 500))
-            message.success(`${getFieldLabel(field)}이(가) 업데이트되었습니다.`)
-        } catch (error) {
-            console.error('저장 실패:', error)
+    const handleSave = (field: keyof ProfileData, value: string) => {
+        if (field === 'userName' && value.length < 2) {
+            message.error('이름은 2자 이상 입력해주세요')
+            return
         }
+
+        if (field === 'userPhone' && !validatePhone(value)) {
+            message.error('올바른 휴대폰 번호 형식이 아닙니다')
+            return
+        }
+
+        saveProfile(field, value)
     }
 
-    const getFieldLabel = (field: keyof ProfileData): string => {
-        const labels: Record<keyof ProfileData, string> = {
-            name: '이름',
-            email: '이메일',
-            phone: '휴대폰번호',
-        }
-        return labels[field]
+    /**
+     * @function saveProfile
+     * @description 프로필 수정 api 호출
+     */
+    const saveProfile = async (field: keyof ProfileData, value: string) => {
+        // POST 호출
+        updateProfile(
+            {
+                [field]: value,
+            },
+            {
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ['profile'] })
+                    setEditingField(null)
+                },
+            },
+        )
     }
+
+    // const getFieldLabel = (field: keyof ProfileData): string => {
+    //     const labels: Record<keyof ProfileData, string> = {
+    //         userName: '이름',
+    //         email: '이메일',
+    //         userPhone: '휴대폰번호',
+    //     }
+    //     return labels[field]
+    // }
 
     const handleStartEditing = (field: keyof ProfileData) => {
         setEditingField(field)
@@ -58,11 +73,11 @@ export default function ProfileEdit() {
 
     return (
         <Layout className={profileStyles.container}>
-            <Title level={2} className={profileStyles.title}>
+            <Typography.Title level={2} className={profileStyles.title}>
                 내 정보
-            </Title>
+            </Typography.Title>
 
-            <Text className={profileStyles.sectionDescription}>계정 정보를 확인하고 필요한 경우 수정할 수 있습니다.</Text>
+            <Typography.Text className={profileStyles.sectionDescription}>계정 정보를 확인하고 필요한 경우 수정할 수 있습니다.</Typography.Text>
 
             <div className={profileStyles.form}>
                 <div className={profileStyles.infoSection}>
@@ -75,18 +90,18 @@ export default function ProfileEdit() {
                         onCancelEditing={handleCancelEditing}
                     />
                     <InfoItem
-                        field="name"
+                        field="userName"
                         initialValue={profile?.userName || ''}
                         onSave={handleSave}
-                        isEditing={editingField === 'name'}
+                        isEditing={editingField === 'userName'}
                         onStartEditing={handleStartEditing}
                         onCancelEditing={handleCancelEditing}
                     />
                     <InfoItem
-                        field="phone"
+                        field="userPhone"
                         initialValue={profile?.userPhone || ''}
                         onSave={handleSave}
-                        isEditing={editingField === 'phone'}
+                        isEditing={editingField === 'userPhone'}
                         onStartEditing={handleStartEditing}
                         onCancelEditing={handleCancelEditing}
                     />

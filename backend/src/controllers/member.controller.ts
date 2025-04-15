@@ -129,6 +129,22 @@ export const memberController = {
                 return res.status(401).json(createResponse(null, 0, 401, '인증되지 않은 사용자입니다.'))
             }
 
+            // 입력 데이터 검증
+            const { userName, userPhone } = req.body
+            if (!userName && !userPhone) {
+                return res.status(400).json(createResponse(null, 0, 400, '수정할 이름 또는 전화번호를 입력해주세요.'))
+            }
+
+            // 이름 검증
+            if (userName && (userName.length < 2 || userName.length > 10)) {
+                return res.status(400).json(createResponse(null, 0, 400, '이름은 2자 이상 10자 이하로 입력해주세요.'))
+            }
+
+            // 전화번호 검증
+            if (userPhone && !/^\d{10,11}$/.test(userPhone)) {
+                return res.status(400).json(createResponse(null, 0, 400, '전화번호는 10~11자리의 숫자로 입력해주세요.'))
+            }
+
             const result = await memberService.updateProfile(id, req.body)
             res.status(result.resultCd === 201 ? 200 : 400).json(result)
         } catch (error: any) {
