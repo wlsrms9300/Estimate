@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query'
 
 // components
 import InfoItem from './InfoItem'
+import EmailEditModal from './EmailEditModal'
 
 interface ProfileData {
     userName: string
@@ -18,6 +19,7 @@ export default function ProfileEdit() {
     const queryClient = useQueryClient()
     const { data: profile } = useGetProfile()
     const [editingField, setEditingField] = useState<keyof ProfileData | null>(null)
+    const [isEmailModalOpen, setIsEmailModalOpen] = useState(false)
 
     const { mutate: updateProfile } = useUpdateProfile()
 
@@ -88,6 +90,7 @@ export default function ProfileEdit() {
                         isEditing={editingField === 'email'}
                         onStartEditing={handleStartEditing}
                         onCancelEditing={handleCancelEditing}
+                        setIsEmailModalOpen={setIsEmailModalOpen}
                     />
                     <InfoItem
                         field="userName"
@@ -107,6 +110,7 @@ export default function ProfileEdit() {
                     />
                 </div>
             </div>
+            <EmailEditModal isModalOpen={isEmailModalOpen} handleCancel={() => setIsEmailModalOpen(false)} />
         </Layout>
     )
 }

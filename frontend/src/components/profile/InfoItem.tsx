@@ -19,9 +19,10 @@ interface InfoItemProps {
     isEditing: boolean
     onStartEditing: (field: keyof ProfileData) => void
     onCancelEditing: () => void
+    setIsEmailModalOpen?: (isOpen: boolean) => void
 }
 
-export default function InfoItem({ field, initialValue, onSave, isEditing, onStartEditing, onCancelEditing }: InfoItemProps) {
+export default function InfoItem({ field, initialValue, onSave, isEditing, onStartEditing, onCancelEditing, setIsEmailModalOpen }: InfoItemProps) {
     const [value, setValue] = useState(initialValue)
     const { control, setValue: setFormValue } = useForm({
         defaultValues: { [field]: initialValue },
@@ -37,11 +38,31 @@ export default function InfoItem({ field, initialValue, onSave, isEditing, onSta
         return labels[field]
     }
 
+    /**
+     * @function handleEdit
+     * @description 수정 버튼 클릭 시 이벤트
+     */
+    const handleEdit = () => {
+        if (field === 'email') {
+            setIsEmailModalOpen?.(true)
+        } else {
+            onStartEditing(field)
+        }
+    }
+
+    /**
+     * @function handleSave
+     * @description 저장 버튼 클릭 시 이벤트
+     */
     const handleSave = () => {
         onSave(field, value)
         onCancelEditing()
     }
 
+    /**
+     * @function handleCancel
+     * @description 취소 버튼 클릭 시 이벤트
+     */
     const handleCancel = () => {
         setValue(initialValue)
         setFormValue(field, initialValue)
@@ -118,7 +139,7 @@ export default function InfoItem({ field, initialValue, onSave, isEditing, onSta
                             </Button>
                         </div>
                     ) : (
-                        <Button type="default" className={profileStyles.infoEditButton} onClick={() => onStartEditing(field)} icon={<EditOutlined />}>
+                        <Button type="default" className={profileStyles.infoEditButton} onClick={handleEdit} icon={<EditOutlined />}>
                             수정
                         </Button>
                     )}

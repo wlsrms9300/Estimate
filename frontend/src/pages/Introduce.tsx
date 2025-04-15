@@ -10,6 +10,19 @@ export default function Introduce() {
     const [isModalOpen, setIsModalOpen] = useState(false)
 
     /**
+     * @function handleStart
+     * @description 시작하기 버튼 클릭 시 모달 열기
+     */
+    const handleStart = () => {
+        const at = localStorage.getItem('at')
+        if (at) {
+            navigate('/so')
+        } else {
+            setIsModalOpen(true)
+        }
+    }
+
+    /**
      * @function handleCancel
      * @description 로그인 모달 닫기
      */
@@ -25,7 +38,7 @@ export default function Introduce() {
                     <nav className={introduceStyles.nav}>
                         {/* <a className={introduceStyles.navLink}>요금제</a> */}
                         <a className={introduceStyles.navLink}>고객지원</a>
-                        <Button onClick={() => setIsModalOpen(true)} className={introduceStyles.primaryButton}>
+                        <Button onClick={handleStart} className={introduceStyles.primaryButton}>
                             시작하기
                         </Button>
                     </nav>
@@ -40,7 +53,7 @@ export default function Introduce() {
                                 복잡한 견적서 작성 과정을 자동화하여 업무 효율을 높이세요. 견적서 자동생성으로 시간을 절약하고 정확성을 높일 수
                                 있습니다.
                             </p>
-                            <Button onClick={() => setIsModalOpen(true)} className={introduceStyles.heroButton}>
+                            <Button onClick={handleStart} className={introduceStyles.heroButton}>
                                 무료로 시작하기
                             </Button>
                         </div>

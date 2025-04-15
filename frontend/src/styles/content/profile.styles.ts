@@ -24,4 +24,8 @@ export const profileStyles = {
         '[&_.ant-form-item-explain-error]:!text-[12px] [&_.ant-form-item-explain-error]:!text-red-500 [&_.ant-form-item-explain-error]:!ml-2.5 [&_.ant-form-item-explain-error]:!mt-1',
     formItem: '[&_.ant-form-item-label]:!text-gray-500 [&_.ant-form-item-label]:!text-sm [&_.ant-form-item-label]:!mb-1',
     inputLarge: '!h-10 !rounded-xl !w-full !max-w-sm',
+
+    // StepEmailChange
+    stepContainer: '!bg-white !flex !flex-col !justify-between !pt-20',
+    buttonSize: '!h-[45px] !rounded-xl !w-full',
 }
