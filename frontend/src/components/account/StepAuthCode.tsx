@@ -30,8 +30,8 @@ export default function StepCertNo({ handlePrev, handleNext }: StepCertNoProps) 
     const setCertNo = useAuthStore((state) => state.setCertNo)
     const [reSend, setReSend] = useState(false)
 
-    const mutateCertNo = useVerifyCertNo(handleNext)
-    const mutateEmail = useSendVerificationCode(() => setReSend(false))
+    const mutateCertNo = useVerifyCertNo()
+    const mutateEmail = useSendVerificationCode()
 
     /**
      * @function handleTimerEnd
@@ -47,7 +47,13 @@ export default function StepCertNo({ handlePrev, handleNext }: StepCertNoProps) 
      * @description 인증번호 재발송
      */
     const reSendCertNo = () => {
-        mutateEmail.mutate(email)
+        mutateEmail.mutate(email, {
+            onSuccess: (response) => {
+                if (response.resultCd === 201) {
+                    setReSend(false)
+                }
+            },
+        })
         setFocus('certNo')
     }
 
@@ -57,7 +63,16 @@ export default function StepCertNo({ handlePrev, handleNext }: StepCertNoProps) 
      */
     const onSubmit = (data: CertNoForm) => {
         setCertNo(data.certNo)
-        mutateCertNo.mutate({ email: email, certNo: data.certNo })
+        mutateCertNo.mutate(
+            { email: email, certNo: data.certNo },
+            {
+                onSuccess: (response) => {
+                    if (response.resultCd === 201) {
+                        handleNext()
+                    }
+                },
+            },
+        )
     }
 
     useEffect(() => {

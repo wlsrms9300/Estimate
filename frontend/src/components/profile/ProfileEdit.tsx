@@ -48,9 +48,11 @@ export default function ProfileEdit() {
                 [field]: value,
             },
             {
-                onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ['profile'] })
-                    setEditingField(null)
+                onSuccess: (response) => {
+                    if (response.resultCd === 201) {
+                        queryClient.invalidateQueries({ queryKey: ['profile'] })
+                        setEditingField(null)
+                    }
                 },
             },
         )

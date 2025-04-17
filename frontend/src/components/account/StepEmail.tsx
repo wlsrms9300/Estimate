@@ -7,7 +7,7 @@ import { validateEmail, validationPatterns } from '../../utils/validation'
 import { useSendVerificationCode } from '../../hooks/account/authService'
 interface StepEmailProps {
     handlePrev: () => void
-    handleNext: () => void
+    handleNext: (goToStep?: number) => void
 }
 
 interface EmailForm {
@@ -25,7 +25,7 @@ export default function StepEmail({ handlePrev, handleNext }: StepEmailProps) {
     const email = watch('email')
     const setEmail = useAuthStore((state) => state.setEmail)
 
-    const mutateEmail = useSendVerificationCode(handleNext)
+    const mutateEmail = useSendVerificationCode()
 
     /**
      * @function onSubmit
@@ -33,7 +33,13 @@ export default function StepEmail({ handlePrev, handleNext }: StepEmailProps) {
      */
     const onSubmit = (data: EmailForm) => {
         setEmail(data.email)
-        mutateEmail.mutate(data.email)
+        mutateEmail.mutate(data.email, {
+            onSuccess: (response) => {
+                if (response.resultCd === 201) {
+                    handleNext(response.code === 10000 ? 5 : 0)
+                }
+            },
+        })
     }
 
     useEffect(() => {

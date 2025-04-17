@@ -130,9 +130,9 @@ export const memberController = {
             }
 
             // 입력 데이터 검증
-            const { userName, userPhone } = req.body
-            if (!userName && !userPhone) {
-                return res.status(400).json(createResponse(null, 0, 400, '수정할 이름 또는 전화번호를 입력해주세요.'))
+            const { userName, userPhone, userId } = req.body
+            if (!userName && !userPhone && !userId) {
+                return res.status(400).json(createResponse(null, 0, 400, '수정할 이름, 전화번호, 이메일을 입력해주세요.'))
             }
 
             // 이름 검증
@@ -143,6 +143,11 @@ export const memberController = {
             // 전화번호 검증
             if (userPhone && !/^\d{10,11}$/.test(userPhone)) {
                 return res.status(400).json(createResponse(null, 0, 400, '전화번호는 10~11자리의 숫자로 입력해주세요.'))
+            }
+
+            // 이메일 검증
+            if (userId && !/^\S+@\S+\.\S+$/.test(userId)) {
+                return res.status(400).json(createResponse(null, 0, 400, '이메일 형식이 올바르지 않습니다.'))
             }
 
             const result = await memberService.updateProfile(id, req.body)

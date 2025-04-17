@@ -9,7 +9,7 @@ import { SignupForm, LoginForm } from '../../types/account/auth'
  * @post /member/emailCertSend
  * @description 이메일 인증 코드 전송
  */
-export const useSendVerificationCode = (onSuccess?: (step?: number) => void) => {
+export const useSendVerificationCode = () => {
     const { openNotification } = useCustomNotification()
 
     return useMutation({
@@ -20,7 +20,7 @@ export const useSendVerificationCode = (onSuccess?: (step?: number) => void) => 
                     alert('인증번호: ' + response.data.certNo)
                     openNotification('success', '이메일 인증코드 발송', response.resultMsg)
                 }
-                onSuccess?.(response.code === 10000 ? 5 : 0)
+                // onSuccess?.(response.code === 10000 ? 5 : 0)
             } else {
                 openNotification('error', '이메일 인증코드 발송 실패', '이메일을 확인해 주세요.')
             }
@@ -36,7 +36,7 @@ export const useSendVerificationCode = (onSuccess?: (step?: number) => void) => 
  * @post /member/emailCertCheck
  * @description 이메일 인증 코드 확인
  */
-export const useVerifyCertNo = (onSuccess?: () => void) => {
+export const useVerifyCertNo = () => {
     const { openNotification } = useCustomNotification()
 
     return useMutation({
@@ -44,7 +44,6 @@ export const useVerifyCertNo = (onSuccess?: () => void) => {
         onSuccess: (response) => {
             if (response.resultCd === 201) {
                 openNotification('success', '인증코드 확인 성공', response.resultMsg)
-                onSuccess?.()
             } else {
                 openNotification('error', '인증코드 확인 실패', '인증코드를 확인 해주세요.')
             }

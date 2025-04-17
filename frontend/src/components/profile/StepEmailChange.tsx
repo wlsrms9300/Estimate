@@ -4,12 +4,20 @@ import { profileStyles } from '../../styles/content/profile.styles'
 import { useForm, Controller } from 'react-hook-form'
 import { validationPatterns } from '../../utils/validation'
 import { validateEmail } from '../../utils/validation'
+import { useSendVerificationCode } from '../../hooks/account/authService'
+import useCustomNotification from '../../hooks/notification'
+import { useAuthStore } from '../../stores/authStore'
 
 interface EmailForm {
     email: string
 }
 
-export default function StepEmailChange() {
+interface StepEmailChangeProps {
+    handleNext: (goToStep?: number) => void
+}
+
+export default function StepEmailChange({ handleNext }: StepEmailChangeProps) {
+    const { openNotification } = useCustomNotification()
     const { control, handleSubmit, setFocus, watch, reset } = useForm<EmailForm>({
         defaultValues: {
             email: '',
@@ -18,9 +26,24 @@ export default function StepEmailChange() {
     })
 
     const email = watch('email')
+    const setEmail = useAuthStore((state) => state.setEmail)
+
+    const mutateEmail = useSendVerificationCode()
 
     const onSubmit = (data: EmailForm) => {
-        console.log(data)
+        setEmail(data.email)
+        mutateEmail.mutate(data.email, {
+            onSuccess: (response) => {
+                if (response.resultCd === 201) {
+                    if (response.code === 10000) {
+                        openNotification('info', '인증코드 발송', response.resultMsg)
+                        handleNext(1)
+                    } else {
+                        handleNext(2)
+                    }
+                }
+            },
+        })
     }
 
     // 컴포넌트가 마운트될 때 이메일 필드에 포커스 설정
@@ -70,7 +93,7 @@ export default function StepEmailChange() {
                     <Form.Item>
                         <Flex justify="space-between" className="!mt-10" gap={10}>
                             <Button
-                                // loading={mutateEmail.isPending}
+                                loading={mutateEmail.isPending}
                                 type="primary"
                                 htmlType="submit"
                                 className={profileStyles.buttonSize}
