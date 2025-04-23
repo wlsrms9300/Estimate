@@ -2,18 +2,19 @@ import { useState } from 'react'
 import { Layout } from 'antd'
 import { FileTextOutlined, SettingOutlined, UserOutlined, BellOutlined } from '@ant-design/icons'
 import { estimateMenuStyles } from '../../styles/content/estimatemenu.styles'
+import { useNavigate } from 'react-router-dom'
 
 export default function EstimateMenu() {
+    const navigate = useNavigate()
+
     return (
         <div className={estimateMenuStyles.contentContainer}>
             <div className={estimateMenuStyles.contentGrid}>
                 <div className={estimateMenuStyles.newEstimateCard}>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between" onClick={() => navigate('/so/add/estimate')}>
                         <div>
                             <h3 className={estimateMenuStyles.newEstimateTitle}>새 견적서 작성하기</h3>
-                            <p className={estimateMenuStyles.newEstimateDescription}>
-                                AI 기반 자동 견적서 생성 시스템으로 빠르고 정확하게 작성하세요
-                            </p>
+                            <p className={estimateMenuStyles.newEstimateDescription}>견적서 생성 시스템으로 빠르고 정확하게 작성하세요</p>
                         </div>
                         <FileTextOutlined className={estimateMenuStyles.newEstimateIcon} />
                     </div>

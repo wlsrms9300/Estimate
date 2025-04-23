@@ -36,7 +36,7 @@ instance.interceptors.response.use(
                 // store 초기화
                 resetAllStores()
                 // introduce 페이지로 리다이렉션
-                window.location.href = '/authExpire'
+                window.location.href = '/auth/expire'
                 break
             case 403:
                 // 토큰 만료 - 토큰 갱신 시도
@@ -65,7 +65,7 @@ instance.interceptors.response.use(
                         // store 초기화
                         resetAllStores()
                         // introduce 페이지로 리다이렉션
-                        window.location.href = '/authExpire'
+                        window.location.href = '/auth/expire'
                     }
                 }
                 break

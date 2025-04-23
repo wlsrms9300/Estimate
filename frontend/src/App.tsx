@@ -6,11 +6,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ConfigProvider, App, Spin } from 'antd'
 import { lazy, Suspense } from 'react'
 
+// not lazy-loaded pages / components
+import Introduce from './pages/Introduce'
+import MainLayout from './pages/MainLayout'
+
 // lazy-loaded pages / components
-const Introduce = lazy(() => import('./pages/Introduce'))
-const MainLayout = lazy(() => import('./pages/MainLayout'))
 const AuthExpire = lazy(() => import('./pages/AuthExpire'))
 const EstimateMenu = lazy(() => import('./components/content/EstimateMenu'))
+const AddEstimate = lazy(() => import('./components/content/AddEstimate'))
 const ProfileEdit = lazy(() => import('./components/profile/ProfileEdit'))
 
 // auth
@@ -56,11 +59,12 @@ function MyApp() {
                             <Suspense fallback={<LoadingFallback />}>
                                 <Routes>
                                     <Route path="/" element={<Introduce />} />
-                                    <Route path="/authExpire" element={<AuthExpire />} />
+                                    <Route path="/auth/expire" element={<AuthExpire />} />
                                     <Route element={<PrivateRoute />}>
                                         <Route path="/so" element={<MainLayout />}>
                                             <Route path="estimate" element={<EstimateMenu />} />
                                             <Route path="profile" element={<ProfileEdit />} />
+                                            <Route path="add/estimate" element={<AddEstimate />} />
                                         </Route>
                                     </Route>
                                 </Routes>

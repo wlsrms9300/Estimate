@@ -21,7 +21,7 @@ const PrivateRoute: React.FC = () => {
         )
     }
 
-    return isAuthenticated ? <Outlet /> : <Navigate to="/authExpire" replace />
+    return isAuthenticated ? <Outlet /> : <Navigate to="/auth/expire" replace />
 }
 
 export default PrivateRoute
