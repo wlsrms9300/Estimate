@@ -12,6 +12,7 @@ interface JwtPayload {
 interface AuthContextType {
     isAuthenticated: boolean | null
     checkToken: () => Promise<boolean>
+    updateAuthState: (isAuth: boolean) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -26,6 +27,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem('at')
         setIsAuthenticated(false)
         checkInProgress.current = false
+    }
+
+    const updateAuthState = (isAuth: boolean) => {
+        setIsAuthenticated(isAuth)
     }
 
     const checkToken = useCallback(async (): Promise<boolean> => {
@@ -84,7 +89,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     }, [checkToken])
 
-    return <AuthContext.Provider value={{ isAuthenticated, checkToken }}>{children}</AuthContext.Provider>
+    return <AuthContext.Provider value={{ isAuthenticated, checkToken, updateAuthState }}>{children}</AuthContext.Provider>
 }
 
 export const useAuth = (): AuthContextType => {
