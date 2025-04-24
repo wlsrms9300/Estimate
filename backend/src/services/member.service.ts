@@ -324,19 +324,4 @@ export const memberService = {
             return createResponse(null, 0, 500, '프로필 수정 중 오류가 발생했습니다.' + '[' + error.message + ']')
         }
     },
-
-    // // 프로필 삭제
-    // async deleteProfile(userId: string) {
-    //     try {
-    //         const { error } = await supabase.from('EM_MEMBER').delete().eq('user_id', userId)
-
-    //         if (error) {
-    //             return createResponse(null, 0, 500, '프로필 삭제 중 오류가 발생했습니다.' + '[' + error.message + ']')
-    //         }
-
-    //         return createResponse(null, 0, 201, '프로필 삭제 성공')
-    //     } catch (error: any) {
-    //         return createResponse(null, 0, 500, '프로필 삭제 중 오류가 발생했습니다.' + '[' + error.message + ']')
-    //     }
-    // },
 }

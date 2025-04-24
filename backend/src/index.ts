@@ -2,7 +2,10 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
+// routes
 import memberRoutes from './routes/member.routes'
+import estimateRoutes from './routes/estimate.routes'
+// middleware
 import { errorHandler } from './middleware/error.middleware'
 
 dotenv.config()
@@ -21,10 +24,11 @@ app.use(
 app.use(express.json())
 app.use(cookieParser())
 
-app.get('/', function (req, res) {
-    res.send('테스트입니다.')
-})
+// routes
 app.use('/member', memberRoutes)
+app.use('/estimate', estimateRoutes)
+
+// middleware
 app.use(errorHandler)
 
 app.listen(port, () => {

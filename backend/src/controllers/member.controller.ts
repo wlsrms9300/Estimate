@@ -156,19 +156,4 @@ export const memberController = {
             res.status(500).json(createResponse(null, 0, 500, '프로필 수정 중 오류가 발생했습니다.' + '[' + error.message + ']'))
         }
     },
-
-    // // 프로필 삭제
-    // async deleteProfile(req: Request, res: Response) {
-    //     try {
-    //         const userId = req.user?.userId
-    //         if (!userId) {
-    //             return res.status(401).json(createResponse(null, 0, 401, '인증되지 않은 사용자입니다.'))
-    //         }
-
-    //         const result = await memberService.deleteProfile(userId)
-    //         res.status(result.resultCd === 201 ? 200 : 400).json(result)
-    //     } catch (error: any) {
-    //         res.status(500).json(createResponse(null, 0, 500, '프로필 삭제 중 오류가 발생했습니다.' + '[' + error.message + ']'))
-    //     }
-    // },
 }

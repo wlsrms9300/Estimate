@@ -3,32 +3,10 @@ import { Layout, Typography, Form, Input, Button, Table, Space, Flex, InputNumbe
 import { PlusOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons'
 import { addEstimateStyles } from '../../styles/content/addestimate.styles'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
+// types
+import { EstimateForm } from '../../types/content/estimate'
 
 const { Title, Text } = Typography
-
-interface EstimateItem {
-    id: string
-    name: string
-    specification: string
-    unit: string
-    quantity: number
-    unitPrice: number
-    tax: number
-    amount: number
-    note: string
-}
-
-interface EstimateForm {
-    manager: string
-    representative: string
-    companyName: string
-    companyAddress: string
-    contactNumber: string
-    estimateName: string
-    accountNumber: string
-    note: string
-    items: EstimateItem[]
-}
 
 export default function AddEstimate() {
     const bottomRef = useRef<HTMLDivElement>(null)
@@ -261,7 +239,7 @@ export default function AddEstimate() {
                                         validateStatus={error ? 'error' : ''}
                                         help={error?.message}
                                         className={`${addEstimateStyles.formItem} ${addEstimateStyles.formItemError}`}>
-                                        <Input {...field} placeholder="담당자명을 입력하세요" className={addEstimateStyles.input} />
+                                        <Input {...field} size="large" placeholder="담당자명을 입력하세요" className={addEstimateStyles.input} />
                                     </Form.Item>
                                 )}
                             />
@@ -277,7 +255,7 @@ export default function AddEstimate() {
                                         validateStatus={error ? 'error' : ''}
                                         help={error?.message}
                                         className={`${addEstimateStyles.formItem} ${addEstimateStyles.formItemError}`}>
-                                        <Input {...field} placeholder="대표자명을 입력하세요" className={addEstimateStyles.input} />
+                                        <Input {...field} size="large" placeholder="대표자명을 입력하세요" className={addEstimateStyles.input} />
                                     </Form.Item>
                                 )}
                             />
@@ -296,7 +274,7 @@ export default function AddEstimate() {
                                         validateStatus={error ? 'error' : ''}
                                         help={error?.message}
                                         className={`${addEstimateStyles.formItem} ${addEstimateStyles.formItemError}`}>
-                                        <Input {...field} placeholder="업체명을 입력하세요" className={addEstimateStyles.input} />
+                                        <Input {...field} size="large" placeholder="업체명을 입력하세요" className={addEstimateStyles.input} />
                                     </Form.Item>
                                 )}
                             />
@@ -312,7 +290,7 @@ export default function AddEstimate() {
                                         validateStatus={error ? 'error' : ''}
                                         help={error?.message}
                                         className={`${addEstimateStyles.formItem} ${addEstimateStyles.formItemError}`}>
-                                        <Input {...field} placeholder="연락처를 입력하세요" className={addEstimateStyles.input} />
+                                        <Input {...field} size="large" placeholder="연락처를 입력하세요" className={addEstimateStyles.input} />
                                     </Form.Item>
                                 )}
                             />
@@ -329,7 +307,7 @@ export default function AddEstimate() {
                                 validateStatus={error ? 'error' : ''}
                                 help={error?.message}
                                 className={`${addEstimateStyles.formItem} ${addEstimateStyles.formItemError}`}>
-                                <Input {...field} placeholder="업체주소를 입력하세요" className={addEstimateStyles.input} />
+                                <Input {...field} size="large" placeholder="업체주소를 입력하세요" className={addEstimateStyles.input} />
                             </Form.Item>
                         )}
                     />
@@ -341,7 +319,7 @@ export default function AddEstimate() {
                                 control={control}
                                 render={({ field }) => (
                                     <Form.Item label="견적서명" className={addEstimateStyles.formItem}>
-                                        <Input {...field} placeholder="견적서명을 입력하세요" className={addEstimateStyles.input} />
+                                        <Input {...field} size="large" placeholder="견적서명을 입력하세요" className={addEstimateStyles.input} />
                                     </Form.Item>
                                 )}
                             />
@@ -357,7 +335,7 @@ export default function AddEstimate() {
                                         validateStatus={error ? 'error' : ''}
                                         help={error?.message}
                                         className={`${addEstimateStyles.formItem} ${addEstimateStyles.formItemError}`}>
-                                        <Input {...field} placeholder="계좌번호를 입력하세요" className={addEstimateStyles.input} />
+                                        <Input {...field} size="large" placeholder="계좌번호를 입력하세요" className={addEstimateStyles.input} />
                                     </Form.Item>
                                 )}
                             />
