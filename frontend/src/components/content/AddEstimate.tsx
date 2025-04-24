@@ -3,13 +3,19 @@ import { Layout, Typography, Form, Input, Button, Table, Space, Flex, InputNumbe
 import { PlusOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons'
 import { addEstimateStyles } from '../../styles/content/addestimate.styles'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
+// components
+import PostCode from '../common/PostCode'
+// hooks
+import { useGetProfile } from '../../hooks/account/authService'
 // types
 import { EstimateForm } from '../../types/content/estimate'
 
-const { Title, Text } = Typography
+const { Title } = Typography
 
 export default function AddEstimate() {
     const bottomRef = useRef<HTMLDivElement>(null)
+    const [isOpen, setIsOpen] = useState(false)
+    const { data: profile } = useGetProfile()
     const { control, handleSubmit, watch, setValue } = useForm<EstimateForm>({
         defaultValues: {
             estimateName: '견적서',
@@ -23,11 +29,23 @@ export default function AddEstimate() {
         name: 'items',
     })
 
-    // 아이템 추가 핸들러
+    /**
+     * @function handlePostComplete
+     * @description 주소 검색 완료 핸들러
+     */
+    const handlePostComplete = (data: any) => {
+        console.log(data)
+        setValue('companyAddress', data.address)
+    }
+
+    /**
+     * @function handleAddItem
+     * @description 품목 추가 핸들러
+     */
     const handleAddItem = () => {
         append({
             id: Date.now().toString(),
-            name: '',
+            name: '견적서',
             specification: '',
             unit: '',
             quantity: 0,
@@ -38,7 +56,10 @@ export default function AddEstimate() {
         })
     }
 
-    // 금액 자동 계산
+    /**
+     * @function handleAddItem
+     * @description 금액 자동 계산
+     */
     useEffect(() => {
         const subscription = watch((value, { name }) => {
             const items = value.items || []
@@ -61,7 +82,10 @@ export default function AddEstimate() {
         return () => subscription.unsubscribe()
     }, [watch, setValue])
 
-    // 폼 제출 핸들러
+    /**
+     * @function onSubmit
+     * @description 폼 제출 핸들러
+     */
     const onSubmit = (data: EstimateForm) => {
         console.log('제출된 데이터:', data)
         // 여기에 API 호출 코드 추가
@@ -219,6 +243,13 @@ export default function AddEstimate() {
         },
     ]
 
+    useEffect(() => {
+        if (profile) {
+            setValue('manager', profile.userName)
+            setValue('representative', profile.userName)
+        }
+    }, [profile])
+
     return (
         <div className={addEstimateStyles.contentContainer}>
             <div className={addEstimateStyles.container}>
@@ -232,7 +263,7 @@ export default function AddEstimate() {
                             <Controller
                                 name="manager"
                                 control={control}
-                                rules={{ required: '담당자명을 입력해주세요' }}
+                                // rules={{ required: '담당자명을 입력해주세요' }}
                                 render={({ field, fieldState: { error } }) => (
                                     <Form.Item
                                         label="담당자명"
@@ -248,7 +279,7 @@ export default function AddEstimate() {
                             <Controller
                                 name="representative"
                                 control={control}
-                                rules={{ required: '대표자명을 입력해주세요' }}
+                                // rules={{ required: '대표자명을 입력해주세요' }}
                                 render={({ field, fieldState: { error } }) => (
                                     <Form.Item
                                         label="대표자명"
@@ -267,7 +298,7 @@ export default function AddEstimate() {
                             <Controller
                                 name="companyName"
                                 control={control}
-                                rules={{ required: '업체명을 입력해주세요' }}
+                                // rules={{ required: '업체명을 입력해주세요' }}
                                 render={({ field, fieldState: { error } }) => (
                                     <Form.Item
                                         label="업체명"
@@ -283,7 +314,7 @@ export default function AddEstimate() {
                             <Controller
                                 name="contactNumber"
                                 control={control}
-                                rules={{ required: '연락처를 입력해주세요' }}
+                                // rules={{ required: '연락처를 입력해주세요' }}
                                 render={({ field, fieldState: { error } }) => (
                                     <Form.Item
                                         label="연락처"
@@ -300,14 +331,20 @@ export default function AddEstimate() {
                     <Controller
                         name="companyAddress"
                         control={control}
-                        rules={{ required: '업체주소를 입력해주세요' }}
+                        // rules={{ required: '업체주소를 입력해주세요' }}
                         render={({ field, fieldState: { error } }) => (
                             <Form.Item
                                 label="업체주소"
                                 validateStatus={error ? 'error' : ''}
                                 help={error?.message}
                                 className={`${addEstimateStyles.formItem} ${addEstimateStyles.formItemError}`}>
-                                <Input {...field} size="large" placeholder="업체주소를 입력하세요" className={addEstimateStyles.input} />
+                                <Input
+                                    {...field}
+                                    size="large"
+                                    placeholder="업체주소를 입력하세요"
+                                    className={addEstimateStyles.input}
+                                    onClick={() => setIsOpen(true)}
+                                />
                             </Form.Item>
                         )}
                     />
@@ -328,7 +365,7 @@ export default function AddEstimate() {
                             <Controller
                                 name="accountNumber"
                                 control={control}
-                                rules={{ required: '계좌번호를 입력해주세요' }}
+                                // rules={{ required: '계좌번호를 입력해주세요' }}
                                 render={({ field, fieldState: { error } }) => (
                                     <Form.Item
                                         label="입금받을 계좌번호"
@@ -386,6 +423,7 @@ export default function AddEstimate() {
                     저장하기
                 </Button>
             </div>
+            <PostCode isOpen={isOpen} toggleModal={setIsOpen} onComplete={handlePostComplete} />
         </div>
     )
 }

@@ -3844,6 +3844,11 @@ react-confetti@^6.1.0:
   dependencies:
     tween-functions "^1.2.0"
 
+react-daum-postcode@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/react-daum-postcode/-/react-daum-postcode-3.2.0.tgz#07fbbc38f4b0c48ee3c8f703eba5e4c9d82ffb2f"
+  integrity sha512-NHY8TUicZXMqykbKYT8kUo2PEU7xu1DFsdRmyWJrLEUY93Xhd3rEdoJ7vFqrvs+Grl9wIm9Byxh3bI+eZxepMQ==
+
 react-docgen-typescript@^2.2.2:
   version "2.2.2"
   resolved "https://registry.npmjs.org/react-docgen-typescript/-/react-docgen-typescript-2.2.2.tgz"
