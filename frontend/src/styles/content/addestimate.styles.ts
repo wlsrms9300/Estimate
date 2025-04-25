@@ -13,7 +13,7 @@ export const addEstimateStyles = {
     noWrap: 'whitespace-nowrap',
     addButton:
         'w-full flex justify-center items-center py-2 border border-dashed border-gray-300 rounded-lg mt-2 cursor-pointer hover:border-[#6366f1] hover:text-[#6366f1] transition-colors',
-    deleteButton: 'text-red-500 hover:text-red-700 text-lg cursor-pointer',
+    deleteButton: '!text-red-500 !text-lg !cursor-pointer',
     floatingButton:
         'w-full !mt-15 !h-14 !bg-[#6366f1] !flex !items-center !justify-center !text-white !text-lg !font-medium !shadow-lg hover:!bg-[#4f46e5] !rounded-lg fixed bottom-0 left-0 right-0 z-50',
 }

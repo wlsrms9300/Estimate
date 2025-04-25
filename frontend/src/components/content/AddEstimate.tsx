@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { Layout, Typography, Form, Input, Button, Table, Space, Flex, InputNumber, Tooltip, Row, Col } from 'antd'
-import { PlusOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons'
+import { PlusOutlined, DeleteOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons'
 import { addEstimateStyles } from '../../styles/content/addestimate.styles'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 // components
 import PostCode from '../common/PostCode'
 // hooks
 import { useGetProfile } from '../../hooks/account/authService'
+import { useCreateEstimate } from '../../hooks/content/estimateService'
 // types
 import { EstimateForm } from '../../types/content/estimate'
 
@@ -16,9 +17,10 @@ export default function AddEstimate() {
     const bottomRef = useRef<HTMLDivElement>(null)
     const [isOpen, setIsOpen] = useState(false)
     const { data: profile } = useGetProfile()
+    const { mutate: createEstimate } = useCreateEstimate()
     const { control, handleSubmit, watch, setValue } = useForm<EstimateForm>({
         defaultValues: {
-            estimateName: '견적서',
+            title: '견적서',
             items: [],
         },
         mode: 'onChange',
@@ -34,8 +36,14 @@ export default function AddEstimate() {
      * @description 주소 검색 완료 핸들러
      */
     const handlePostComplete = (data: any) => {
-        console.log(data)
-        setValue('companyAddress', data.address)
+        setValue('postCode', data.zonecode)
+        setValue('address', data.address)
+        setValue('roadAddress', data.roadAddress)
+        setValue('sido', data.sido)
+        setValue('sigungu', data.sigungu)
+        setValue('sigunguCode', data.sigunguCode)
+        setValue('bName', data.bname)
+        setValue('buildingName', data.buildingName)
     }
 
     /**
@@ -44,43 +52,16 @@ export default function AddEstimate() {
      */
     const handleAddItem = () => {
         append({
-            id: Date.now().toString(),
-            name: '견적서',
+            itemName: '',
             specification: '',
             unit: '',
             quantity: 0,
             unitPrice: 0,
-            tax: 0,
-            amount: 0,
-            note: '',
+            vat: 0,
+            totalPrice: 0,
+            memo: '',
         })
     }
-
-    /**
-     * @function handleAddItem
-     * @description 금액 자동 계산
-     */
-    useEffect(() => {
-        const subscription = watch((value, { name }) => {
-            const items = value.items || []
-
-            items.forEach((item, index) => {
-                if (name?.includes(`items.${index}`)) {
-                    if (!item) return
-
-                    const quantity = item.quantity || 0
-                    const unitPrice = item.unitPrice || 0
-                    const tax = item.tax || 0
-
-                    // 금액 = 수량 * 단가 + 세금
-                    const amount = quantity * unitPrice + tax
-                    setValue(`items.${index}.amount`, amount)
-                }
-            })
-        })
-
-        return () => subscription.unsubscribe()
-    }, [watch, setValue])
 
     /**
      * @function onSubmit
@@ -89,6 +70,7 @@ export default function AddEstimate() {
     const onSubmit = (data: EstimateForm) => {
         console.log('제출된 데이터:', data)
         // 여기에 API 호출 코드 추가
+        createEstimate(data)
     }
 
     const columns = [
@@ -96,22 +78,19 @@ export default function AddEstimate() {
             title: 'No',
             key: 'index',
             width: 50,
+            align: 'center' as const,
             render: (_: any, __: any, index: number) => index + 1,
         },
         {
             title: '품명',
-            dataIndex: 'name',
-            key: 'name',
+            dataIndex: 'itemName',
+            key: 'itemName',
+            align: 'center' as const,
             render: (_: any, __: any, index: number) => (
                 <Controller
-                    name={`items.${index}.name`}
+                    name={`items.${index}.itemName`}
                     control={control}
-                    rules={{ required: '품명을 입력해주세요' }}
-                    render={({ field, fieldState: { error } }) => (
-                        <Form.Item validateStatus={error ? 'error' : ''} help={error?.message} className="mb-0">
-                            <Input {...field} placeholder="품명" className={addEstimateStyles.input} />
-                        </Form.Item>
-                    )}
+                    render={({ field }) => <Input {...field} placeholder="품명" className={addEstimateStyles.input} />}
                 />
             ),
         },
@@ -119,6 +98,7 @@ export default function AddEstimate() {
             title: '규격',
             dataIndex: 'specification',
             key: 'specification',
+            align: 'center' as const,
             render: (_: any, __: any, index: number) => (
                 <Controller
                     name={`items.${index}.specification`}
@@ -131,6 +111,7 @@ export default function AddEstimate() {
             title: '단위',
             dataIndex: 'unit',
             key: 'unit',
+            align: 'center' as const,
             render: (_: any, __: any, index: number) => (
                 <Controller
                     name={`items.${index}.unit`}
@@ -143,6 +124,7 @@ export default function AddEstimate() {
             title: '수량',
             dataIndex: 'quantity',
             key: 'quantity',
+            align: 'center' as const,
             render: (_: any, __: any, index: number) => (
                 <Controller
                     name={`items.${index}.quantity`}
@@ -164,6 +146,7 @@ export default function AddEstimate() {
             title: '단가',
             dataIndex: 'unitPrice',
             key: 'unitPrice',
+            align: 'center' as const,
             render: (_: any, __: any, index: number) => (
                 <Controller
                     name={`items.${index}.unitPrice`}
@@ -183,11 +166,12 @@ export default function AddEstimate() {
         },
         {
             title: '세금(VAT)',
-            dataIndex: 'tax',
-            key: 'tax',
+            dataIndex: 'vat',
+            key: 'vat',
+            align: 'center' as const,
             render: (_: any, __: any, index: number) => (
                 <Controller
-                    name={`items.${index}.tax`}
+                    name={`items.${index}.vat`}
                     control={control}
                     render={({ field }) => (
                         <InputNumber
@@ -204,17 +188,18 @@ export default function AddEstimate() {
         },
         {
             title: '금액',
-            dataIndex: 'amount',
-            key: 'amount',
+            dataIndex: 'totalPrice',
+            key: 'totalPrice',
+            align: 'center' as const,
             render: (_: any, __: any, index: number) => (
                 <Controller
-                    name={`items.${index}.amount`}
+                    name={`items.${index}.totalPrice`}
                     control={control}
                     render={({ field }) => (
                         <InputNumber
                             {...field}
                             placeholder="금액"
-                            disabled
+                            min={0}
                             className={`w-full ${addEstimateStyles.input}`}
                             formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                             parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ''))}
@@ -225,11 +210,12 @@ export default function AddEstimate() {
         },
         {
             title: '비고',
-            dataIndex: 'note',
-            key: 'note',
+            dataIndex: 'memo',
+            key: 'memo',
+            align: 'center' as const,
             render: (_: any, __: any, index: number) => (
                 <Controller
-                    name={`items.${index}.note`}
+                    name={`items.${index}.memo`}
                     control={control}
                     render={({ field }) => <Input {...field} placeholder="비고" className={addEstimateStyles.input} />}
                 />
@@ -239,14 +225,15 @@ export default function AddEstimate() {
             title: '',
             key: 'action',
             width: 50,
-            render: (_: any, __: any, index: number) => <DeleteOutlined className={addEstimateStyles.deleteButton} onClick={() => remove(index)} />,
+            align: 'center' as const,
+            render: (_: any, __: any, index: number) => <CloseOutlined className={addEstimateStyles.deleteButton} onClick={() => remove(index)} />,
         },
     ]
 
     useEffect(() => {
         if (profile) {
-            setValue('manager', profile.userName)
-            setValue('representative', profile.userName)
+            setValue('managerName', profile.userName)
+            setValue('ceoName', profile.userName)
         }
     }, [profile])
 
@@ -261,7 +248,7 @@ export default function AddEstimate() {
                     <Row gutter={24}>
                         <Col span={12}>
                             <Controller
-                                name="manager"
+                                name="managerName"
                                 control={control}
                                 // rules={{ required: '담당자명을 입력해주세요' }}
                                 render={({ field, fieldState: { error } }) => (
@@ -277,7 +264,7 @@ export default function AddEstimate() {
                         </Col>
                         <Col span={12}>
                             <Controller
-                                name="representative"
+                                name="ceoName"
                                 control={control}
                                 // rules={{ required: '대표자명을 입력해주세요' }}
                                 render={({ field, fieldState: { error } }) => (
@@ -312,7 +299,7 @@ export default function AddEstimate() {
                         </Col>
                         <Col span={12}>
                             <Controller
-                                name="contactNumber"
+                                name="phone"
                                 control={control}
                                 // rules={{ required: '연락처를 입력해주세요' }}
                                 render={({ field, fieldState: { error } }) => (
@@ -328,31 +315,56 @@ export default function AddEstimate() {
                         </Col>
                     </Row>
 
-                    <Controller
-                        name="companyAddress"
-                        control={control}
-                        // rules={{ required: '업체주소를 입력해주세요' }}
-                        render={({ field, fieldState: { error } }) => (
-                            <Form.Item
-                                label="업체주소"
-                                validateStatus={error ? 'error' : ''}
-                                help={error?.message}
-                                className={`${addEstimateStyles.formItem} ${addEstimateStyles.formItemError}`}>
-                                <Input
-                                    {...field}
-                                    size="large"
-                                    placeholder="업체주소를 입력하세요"
-                                    className={addEstimateStyles.input}
-                                    onClick={() => setIsOpen(true)}
+                    <Form.Item label="업체주소" className={`${addEstimateStyles.formItem} ${addEstimateStyles.formItemError}`}>
+                        <Row gutter={8}>
+                            <Col span={6}>
+                                <Controller
+                                    name="postCode"
+                                    control={control}
+                                    render={({ field, fieldState: { error } }) => (
+                                        <Input
+                                            {...field}
+                                            readOnly
+                                            size="large"
+                                            placeholder="우편번호"
+                                            className={addEstimateStyles.input}
+                                            onClick={() => setIsOpen(true)}
+                                        />
+                                    )}
                                 />
-                            </Form.Item>
-                        )}
-                    />
+                            </Col>
+                            <Col span={9}>
+                                <Controller
+                                    name="address"
+                                    control={control}
+                                    render={({ field, fieldState: { error } }) => (
+                                        <Input
+                                            {...field}
+                                            readOnly
+                                            size="large"
+                                            placeholder="주소"
+                                            className={addEstimateStyles.input}
+                                            onClick={() => setIsOpen(true)}
+                                        />
+                                    )}
+                                />
+                            </Col>
+                            <Col span={9}>
+                                <Controller
+                                    name="addressDetail"
+                                    control={control}
+                                    render={({ field, fieldState: { error } }) => (
+                                        <Input {...field} size="large" placeholder="상세주소" className={addEstimateStyles.input} />
+                                    )}
+                                />
+                            </Col>
+                        </Row>
+                    </Form.Item>
 
                     <Row gutter={24}>
                         <Col span={12}>
                             <Controller
-                                name="estimateName"
+                                name="title"
                                 control={control}
                                 render={({ field }) => (
                                     <Form.Item label="견적서명" className={addEstimateStyles.formItem}>
@@ -363,7 +375,7 @@ export default function AddEstimate() {
                         </Col>
                         <Col span={12}>
                             <Controller
-                                name="accountNumber"
+                                name="bankAccount"
                                 control={control}
                                 // rules={{ required: '계좌번호를 입력해주세요' }}
                                 render={({ field, fieldState: { error } }) => (
@@ -380,7 +392,7 @@ export default function AddEstimate() {
                     </Row>
 
                     <Controller
-                        name="note"
+                        name="memo"
                         control={control}
                         render={({ field }) => (
                             <Form.Item label="비고" className={addEstimateStyles.formItem}>

@@ -8,17 +8,35 @@ export const estimateService = {
     // 견적서 생성
     async createEstimate(id: string, estimateData: any) {
         try {
+            const { items, ...basicData } = estimateData
             const { data, error } = await supabase
                 .from('EM_ESTIMATE')
                 .insert({
-                    ...transformData.toSnakeCase(estimateData),
-                    member_id: id,
+                    ...transformData.toSnakeCase(basicData),
+                    create_user_id: id,
                 })
                 .select()
                 .single()
 
             if (error) {
                 return createResponse(null, 0, 500, '견적서 생성 중 오류가 발생했습니다.' + '[' + error.message + ']')
+            }
+
+            const estimateId = data.estimate_id
+            if (items && items.length > 0) {
+                const itemInserts = items.map((item: any) => ({
+                    ...transformData.toSnakeCase(item),
+                    estimate_id: estimateId,
+                    create_user_id: id,
+                }))
+
+                console.log(itemInserts)
+
+                const { error: itemError } = await supabase.from('EM_ESTIMATE_ITEM').insert(itemInserts)
+
+                if (itemError) {
+                    return createResponse(null, 0, 500, '견적서 항목 생성 중 오류가 발생했습니다.' + '[' + itemError.message + ']')
+                }
             }
 
             return createResponse(transformData.toCamelCase(data), 0, 201, '견적서 생성 성공')
