@@ -10,6 +10,7 @@ export const addEstimateStyles = {
     input: '!rounded-lg',
     tableContainer:
         'mt-8 mb-6 w-full [&_.ant-table-wrapper]:w-full [&_.ant-table]:w-full [&_.ant-table-container]:w-full [&_.ant-table-content]:w-full [&_.ant-table-thead]:bg-gray-50',
+    tableHeader: '!bg-blue-50/80',
     noWrap: 'whitespace-nowrap',
     addButton:
         'w-full flex justify-center items-center py-2 border border-dashed border-gray-300 rounded-lg mt-2 cursor-pointer hover:border-[#6366f1] hover:text-[#6366f1] transition-colors',

@@ -36,6 +36,25 @@ export default function Navigation({ containerRef }: NavigationProps) {
     ]
 
     /**
+     * @function defaultMenu
+     * @description 새로고침 시 메뉴 선택 유지
+     */
+    const defaultMenu = () => {
+        const path = window.location.pathname
+        if (path.includes('/so/list/estimate')) {
+            setSelectedMenu('documents')
+        } else if (path.includes('/so/list/customer')) {
+            setSelectedMenu('customer')
+        } else if (path.includes('/so/list/company')) {
+            setSelectedMenu('company')
+        } else if (path.includes('/so/setting')) {
+            setSelectedMenu('setting')
+        } else if (path.includes('/so/estimate')) {
+            setSelectedMenu('estimate')
+        }
+    }
+
+    /**
      * @function handleMenuClick
      * @description 메뉴 클릭 시 선택된 메뉴 상태 업데이트
      */
@@ -44,6 +63,23 @@ export default function Navigation({ containerRef }: NavigationProps) {
             setSelectedMenu('')
         } else {
             setSelectedMenu(menu)
+
+            let path = ''
+            switch (menu) {
+                case 'documents':
+                    path = '/so/list/estimate'
+                    break
+                // case 'customer':
+                //     path = '/so/list/customer'
+                //     break
+                // case 'company':
+                //     path = '/so/list/company'
+                //     break
+                default:
+                    path = '/so'
+            }
+
+            navigate(path)
         }
     }
 
@@ -65,6 +101,7 @@ export default function Navigation({ containerRef }: NavigationProps) {
     }
 
     useEffect(() => {
+        defaultMenu()
         if (!containerRef?.current) return
 
         const resizeObserver = new ResizeObserver((entries) => {

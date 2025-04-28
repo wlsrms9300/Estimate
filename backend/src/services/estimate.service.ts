@@ -1,10 +1,22 @@
 import { supabase } from '../config/supabase'
-import { transformData, jwtUtils, createResponse } from '../utils'
-import { TokenPayload } from '../interfaces/auth.interface'
-import nodemailer from 'nodemailer'
-import bcrypt from 'bcrypt'
+import { transformData, createResponse } from '../utils'
 
 export const estimateService = {
+    // 견적서 목록 조회
+    async getEstimateList(id: string) {
+        try {
+            const { data, error } = await supabase.from('EM_ESTIMATE').select('*').eq('create_user_id', id)
+
+            if (error) {
+                return createResponse(null, 0, 500, '견적서 목록 조회 중 오류가 발생했습니다.' + '[' + error.message + ']')
+            }
+
+            return createResponse(transformData.toCamelCase(data), 0, 200, '견적서 목록 조회 성공')
+        } catch (error: any) {
+            return createResponse(null, 0, 500, '견적서 목록 조회 중 오류가 발생했습니다.' + '[' + error.message + ']')
+        }
+    },
+
     // 견적서 생성
     async createEstimate(id: string, estimateData: any) {
         try {
@@ -29,8 +41,6 @@ export const estimateService = {
                     estimate_id: estimateId,
                     create_user_id: id,
                 }))
-
-                console.log(itemInserts)
 
                 const { error: itemError } = await supabase.from('EM_ESTIMATE_ITEM').insert(itemInserts)
 

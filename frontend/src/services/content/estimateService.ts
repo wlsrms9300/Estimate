@@ -1,6 +1,16 @@
 import axios from '../api/axios'
 
 /**
+ * @mutation getEstimateList
+ * @get /estimate/list
+ * @description 견적서 목록 조회
+ */
+export const getEstimateList = async () => {
+    const response = await axios.get('/estimate/list')
+    return response.data
+}
+
+/**
  * @mutation createEstimate
  * @post /estimate/create
  * @description 견적서 생성

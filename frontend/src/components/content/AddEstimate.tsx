@@ -3,6 +3,7 @@ import { Layout, Typography, Form, Input, Button, Table, Space, Flex, InputNumbe
 import { PlusOutlined, DeleteOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons'
 import { addEstimateStyles } from '../../styles/content/addestimate.styles'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 // components
 import PostCode from '../common/PostCode'
 // hooks
@@ -15,6 +16,7 @@ const { Title } = Typography
 
 export default function AddEstimate() {
     const bottomRef = useRef<HTMLDivElement>(null)
+    const navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false)
     const { data: profile } = useGetProfile()
     const { mutate: createEstimate } = useCreateEstimate()
@@ -69,8 +71,11 @@ export default function AddEstimate() {
      */
     const onSubmit = (data: EstimateForm) => {
         console.log('제출된 데이터:', data)
-        // 여기에 API 호출 코드 추가
-        createEstimate(data)
+        createEstimate(data, {
+            onSuccess: () => {
+                navigate('/so/list/estimate')
+            },
+        })
     }
 
     const columns = [
@@ -416,6 +421,11 @@ export default function AddEstimate() {
                             scroll={{ x: true }}
                             className="w-full"
                             tableLayout="fixed"
+                            components={{
+                                header: {
+                                    cell: (props: any) => <th {...props} className={`${props.className} ${addEstimateStyles.tableHeader}`} />,
+                                },
+                            }}
                         />
                     </div>
 
