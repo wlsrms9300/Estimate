@@ -63,7 +63,7 @@
 
 ## 프로젝트 이미지
 -  메인화면
-<img width="600" height="600" alt="메인화면" src="https://github.com/user-attachments/assets/86d02367-9d50-4621-9310-d14ea9f28986" />
+<img width="1710" alt="메인화면" src="https://github.com/user-attachments/assets/86d02367-9d50-4621-9310-d14ea9f28986" />
 
 
 -  시작하기
