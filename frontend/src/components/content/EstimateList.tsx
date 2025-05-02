@@ -3,49 +3,40 @@ import { Layout, Typography, Input, Table, Space, Button, Checkbox, message } fr
 import { SearchOutlined, FileTextOutlined, DeleteOutlined } from '@ant-design/icons'
 import { estimateListStyles } from '../../styles/content/estimatelist.styles'
 import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 // hooks
-import { useGetEstimateList } from '../../hooks/content/estimateService'
+import { useGetEstimateList, useDeleteEstimate } from '../../hooks/content/estimateService'
+// types
+import { EstimateListItem } from '../../types/content/estimate'
 
 const { Title } = Typography
 
-interface Estimate {
-    id: string
-    title: string
-    author: string
-    createdAt: string
-}
-
 export default function EstimateList() {
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
     const [searchText, setSearchText] = useState('')
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-    const { data: estimateList, isLoading, error } = useGetEstimateList()
+    const { data: estimateList, isLoading } = useGetEstimateList()
+    const { mutate: deleteEstimate } = useDeleteEstimate()
 
-    // 임시 데이터 (실제로는 API에서 가져와야 함)
-    const data: Estimate[] = [
-        {
-            id: '1',
-            title: '2024년 1분기 웹 개발 견적서',
-            author: '김철수',
-            createdAt: '2024-01-15',
-        },
-        {
-            id: '2',
-            title: '모바일 앱 개발 견적서',
-            author: '이영희',
-            createdAt: '2024-01-20',
-        },
-    ]
-
+    /**
+     * @function handleBatchDelete
+     * @description 일괄 삭제
+     */
     const handleBatchDelete = () => {
         if (selectedRowKeys.length === 0) {
             message.warning('삭제할 견적서를 선택해주세요.')
             return
         }
-        // 실제로는 API 호출이 필요
-        console.log('일괄 삭제:', selectedRowKeys)
-        message.success(`${selectedRowKeys.length}개의 견적서가 삭제되었습니다.`)
-        setSelectedRowKeys([])
+
+        deleteEstimate(selectedRowKeys.join(','), {
+            onSuccess: (response) => {
+                if (response.resultCd === 201) {
+                    queryClient.invalidateQueries({ queryKey: ['estimateList'] })
+                    setSelectedRowKeys([])
+                }
+            },
+        })
     }
 
     const columns = [
@@ -55,6 +46,7 @@ export default function EstimateList() {
             key: 'id',
             width: 80,
             align: 'center' as const,
+            render: (_: any, record: EstimateListItem, index: number) => <span>{index + 1}</span>,
         },
         {
             title: '견적서명',
@@ -68,9 +60,9 @@ export default function EstimateList() {
             ),
         },
         {
-            title: '작성자',
-            dataIndex: 'author',
-            key: 'author',
+            title: '담당자',
+            dataIndex: 'managerName',
+            key: 'managerName',
             width: 120,
         },
         {
@@ -78,14 +70,15 @@ export default function EstimateList() {
             dataIndex: 'createdAt',
             key: 'createdAt',
             width: 120,
+            render: (_: any, record: EstimateListItem) => <span>{record.createdAt.split('T')[0]}</span>,
         },
         {
             title: '',
             key: 'action',
             width: 120,
-            render: (_: any, record: Estimate) => (
+            render: (_: any, record: EstimateListItem) => (
                 <Space size="middle">
-                    <Button type="link" onClick={() => navigate(`/so/edit/estimate/${record.id}`)}>
+                    <Button type="link" onClick={() => navigate(`/so/edit/estimate/${record.estimateId}`)}>
                         수정
                     </Button>
                     {/* <Button type="link" danger onClick={() => console.log('삭제', record.id)}>
@@ -96,8 +89,8 @@ export default function EstimateList() {
         },
     ]
 
-    const filteredData = data.filter(
-        (item) => item.title.toLowerCase().includes(searchText.toLowerCase()) || item.author.toLowerCase().includes(searchText.toLowerCase()),
+    const filteredData = estimateList?.filter(
+        (item: any) => item.title.toLowerCase().includes(searchText.toLowerCase()) || item.author.toLowerCase().includes(searchText.toLowerCase()),
     )
 
     return (
@@ -133,8 +126,8 @@ export default function EstimateList() {
                 <div className={estimateListStyles.tableContainer}>
                     <Table
                         columns={columns}
-                        dataSource={filteredData}
-                        rowKey="id"
+                        dataSource={estimateList}
+                        rowKey="estimateId"
                         pagination={{ pageSize: 10 }}
                         rowSelection={{
                             selectedRowKeys,

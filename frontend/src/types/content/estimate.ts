@@ -39,3 +39,32 @@ export interface EstimateForm {
     memo: string
     items: EstimateItem[]
 }
+
+/**
+ * @interface EstimateListItem
+ * @description 견적서 리스트 아이템
+ */
+export interface EstimateListItem {
+    address: string
+    addressDetail: string
+    bName: string
+    bankAccount: string
+    buildingName: string
+    ceoName: string
+    companyName: string
+    createdAt: string
+    estimateId: string
+    managerName: string
+    memo: string
+    phone: string
+    postCode: string
+    quoteDate: string
+    roadAddress: string
+    sido: string
+    sigungu: string
+    sigunguCode: string
+    supplyPrice: number
+    title: string
+    totalPrice: number
+    vat: number
+}

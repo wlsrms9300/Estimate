@@ -81,9 +81,19 @@ export const estimateService = {
     },
 
     // 견적서 삭제
-    async deleteEstimate(id: string, estimateId: string) {
+    async deleteEstimate(id: string, estimateIds: string) {
         try {
-            const { data, error } = await supabase.from('EM_ESTIMATE').delete().eq('id', estimateId).eq('member_id', id)
+            const estimateIdArray = estimateIds.split(',').map((id) => id.trim())
+
+            // 먼저 견적서 항목 삭제
+            const { error: itemsError } = await supabase.from('EM_ESTIMATE_ITEM').delete().in('estimate_id', estimateIdArray)
+
+            if (itemsError) {
+                return createResponse(null, 0, 500, '견적서 항목 삭제 중 오류가 발생했습니다.' + '[' + itemsError.message + ']')
+            }
+
+            // 견적서 삭제
+            const { data, error } = await supabase.from('EM_ESTIMATE').delete().in('estimate_id', estimateIdArray).eq('create_user_id', id)
 
             if (error) {
                 return createResponse(null, 0, 500, '견적서 삭제 중 오류가 발생했습니다.' + '[' + error.message + ']')

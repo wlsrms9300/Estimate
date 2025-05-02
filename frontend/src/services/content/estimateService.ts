@@ -32,10 +32,10 @@ export const updateEstimate = async (estimateId: string, data: any) => {
 
 /**
  * @mutation deleteEstimate
- * @delete /estimate/delete/:estimateId
+ * @delete /estimate/delete/:estimateIds
  * @description 견적서 삭제
  */
-export const deleteEstimate = async (estimateId: string) => {
-    const response = await axios.delete(`/estimate/delete/${estimateId}`)
+export const deleteEstimate = async (estimateIds: string) => {
+    const response = await axios.delete(`/estimate/delete/${estimateIds}`)
     return response.data
 }

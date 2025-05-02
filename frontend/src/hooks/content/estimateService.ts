@@ -70,7 +70,7 @@ export const useUpdateEstimate = () => {
 
 /**
  * @mutation useDeleteEstimate
- * @delete /estimate/delete/:estimateId
+ * @delete /estimate/delete/:estimateIds
  * @description 견적서 삭제
  */
 export const useDeleteEstimate = () => {
