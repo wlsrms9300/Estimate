@@ -15,6 +15,7 @@ const AuthExpire = lazy(() => import('./pages/AuthExpire'))
 const EstimateMenu = lazy(() => import('./components/content/EstimateMenu'))
 const AddEstimate = lazy(() => import('./components/content/AddEstimate'))
 const ProfileEdit = lazy(() => import('./components/profile/ProfileEdit'))
+const EstimateList = lazy(() => import('./components/content/EstimateList'))
 
 // auth
 import PrivateRoute from './components/auth/PrivateRoute'
@@ -65,6 +66,7 @@ function MyApp() {
                                             <Route path="estimate" element={<EstimateMenu />} />
                                             <Route path="profile" element={<ProfileEdit />} />
                                             <Route path="add/estimate" element={<AddEstimate />} />
+                                            <Route path="list/estimate" element={<EstimateList />} />
                                         </Route>
                                     </Route>
                                 </Routes>

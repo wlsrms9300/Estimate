@@ -2,7 +2,10 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { sendVerificationCode, verifyCertNo, signup, login, getProfile, updateProfile } from '../../services/account/authService'
 import useCustomNotification from '../notification'
 import { SHA256 } from 'crypto-js'
+// types
 import { SignupForm, LoginForm } from '../../types/account/auth'
+// context
+import { useAuth } from '../../context/AuthContext'
 
 /**
  * @mutation useSendVerificationCode
@@ -89,6 +92,7 @@ export const useSignup = (onSuccess?: () => void) => {
  */
 export const useLogin = (onSuccess?: () => void) => {
     const { openNotification } = useCustomNotification()
+    const { updateAuthState } = useAuth()
 
     return useMutation({
         mutationFn: (data: LoginForm) => {
@@ -100,9 +104,8 @@ export const useLogin = (onSuccess?: () => void) => {
             if (response.resultCd === 201) {
                 // openNotification('success', '로그인 성공', response.resultMsg)
                 localStorage.setItem('at', response.data.accessToken)
-                setTimeout(() => {
-                    onSuccess?.()
-                }, 1000)
+                updateAuthState(true)
+                onSuccess?.()
             } else {
                 openNotification('error', '로그인 실패', response.resultMsg)
             }
