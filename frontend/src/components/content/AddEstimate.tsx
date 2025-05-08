@@ -3,24 +3,27 @@ import { Layout, Typography, Form, Input, Button, Table, Space, Flex, InputNumbe
 import { PlusOutlined, DeleteOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons'
 import { addEstimateStyles } from '../../styles/content/addestimate.styles'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 // components
 import PostCode from '../common/PostCode'
 // hooks
 import { useGetProfile } from '../../hooks/account/authService'
-import { useCreateEstimate } from '../../hooks/content/estimateService'
+import { useCreateEstimate, useGetEstimateDetail } from '../../hooks/content/estimateService'
 // types
 import { EstimateForm } from '../../types/content/estimate'
 
 const { Title } = Typography
 
 export default function AddEstimate() {
+    const { state } = useLocation()
+    const { estimateId } = state || {}
     const bottomRef = useRef<HTMLDivElement>(null)
     const navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false)
     const { data: profile } = useGetProfile()
     const { mutate: createEstimate } = useCreateEstimate()
-    const { control, handleSubmit, watch, setValue } = useForm<EstimateForm>({
+    const { data: estimate } = useGetEstimateDetail(estimateId)
+    const { control, handleSubmit, setValue } = useForm<EstimateForm>({
         defaultValues: {
             title: '견적서',
             items: [],
@@ -236,11 +239,28 @@ export default function AddEstimate() {
     ]
 
     useEffect(() => {
-        if (profile) {
+        if (profile && !estimateId) {
             setValue('managerName', profile.userName)
             setValue('ceoName', profile.userName)
         }
     }, [profile])
+
+    useEffect(() => {
+        if (estimate) {
+            setValue('estimateId', estimate?.estimateDetail.estimateId)
+            setValue('managerName', estimate?.estimateDetail.managerName)
+            setValue('ceoName', estimate?.estimateDetail.ceoName)
+            setValue('companyName', estimate?.estimateDetail.companyName)
+            setValue('phone', estimate?.estimateDetail.phone)
+            setValue('postCode', estimate?.estimateDetail.postCode)
+            setValue('address', estimate?.estimateDetail.address)
+            setValue('addressDetail', estimate?.estimateDetail.addressDetail)
+            setValue('title', estimate?.estimateDetail.title)
+            setValue('bankAccount', estimate?.estimateDetail.bankAccount)
+            setValue('memo', estimate?.estimateDetail.memo)
+            setValue('items', estimate?.estimateItems)
+        }
+    }, [estimate])
 
     return (
         <div className={addEstimateStyles.contentContainer}>

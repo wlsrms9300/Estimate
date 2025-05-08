@@ -11,9 +11,19 @@ export const getEstimateList = async () => {
 }
 
 /**
+ * @mutation getEstimateDetail
+ * @get /estimate/detail/:estimateId
+ * @description 견적서 상세 조회
+ */
+export const getEstimateDetail = async (estimateId: string) => {
+    const response = await axios.get(`/estimate/detail/${estimateId}`)
+    return response.data
+}
+
+/**
  * @mutation createEstimate
  * @post /estimate/create
- * @description 견적서 생성
+ * @description 견적서 등록/수정
  */
 export const createEstimate = async (data: any) => {
     const response = await axios.post('/estimate/create', data)
@@ -25,10 +35,10 @@ export const createEstimate = async (data: any) => {
  * @post /estimate/update/:estimateId
  * @description 견적서 수정
  */
-export const updateEstimate = async (estimateId: string, data: any) => {
-    const response = await axios.post(`/estimate/update/${estimateId}`, data)
-    return response.data
-}
+// export const updateEstimate = async (estimateId: string, data: any) => {
+//     const response = await axios.post(`/estimate/update/${estimateId}`, data)
+//     return response.data
+// }
 
 /**
  * @mutation deleteEstimate

@@ -76,14 +76,12 @@ export default function EstimateList() {
             title: '',
             key: 'action',
             width: 120,
+            align: 'center' as const,
             render: (_: any, record: EstimateListItem) => (
                 <Space size="middle">
-                    <Button type="link" onClick={() => navigate(`/so/edit/estimate/${record.estimateId}`)}>
+                    <Button type="link" onClick={() => navigate(`/so/add/estimate`, { state: { estimateId: record.estimateId } })}>
                         수정
                     </Button>
-                    {/* <Button type="link" danger onClick={() => console.log('삭제', record.id)}>
-                        삭제
-                    </Button> */}
                 </Space>
             ),
         },

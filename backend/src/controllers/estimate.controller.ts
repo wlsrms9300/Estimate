@@ -18,7 +18,19 @@ export const estimateController = {
         }
     },
 
-    // 견적서 생성
+    // 견적서 상세 조회
+    async getEstimateDetail(req: Request, res: Response) {
+        try {
+            const id = req.user?.id
+            const { estimateId } = req.params
+            const result = await estimateService.getEstimateDetail(id, estimateId)
+            res.status(result.resultCd === 200 ? 200 : 400).json(result)
+        } catch (error: any) {
+            res.status(500).json(createResponse(null, 0, 500, '견적서 상세 조회 중 오류가 발생했습니다.' + '[' + error.message + ']'))
+        }
+    },
+
+    // 견적서 생성/수정
     async createEstimate(req: Request, res: Response) {
         try {
             const id = req.user?.id
@@ -33,21 +45,21 @@ export const estimateController = {
         }
     },
 
-    // 견적서 수정
-    async updateEstimate(req: Request, res: Response) {
-        try {
-            const id = req.user?.id
-            // if (!id) {
-            //     return res.status(401).json(createResponse(null, 0, 401, '인증되지 않은 사용자입니다.'))
-            // }
+    // // 견적서 수정
+    // async updateEstimate(req: Request, res: Response) {
+    //     try {
+    //         const id = req.user?.id
+    //         // if (!id) {
+    //         //     return res.status(401).json(createResponse(null, 0, 401, '인증되지 않은 사용자입니다.'))
+    //         // }
 
-            const { estimateId } = req.params
-            const result = await estimateService.updateEstimate(id, estimateId, req.body)
-            res.status(result.resultCd === 201 ? 200 : 400).json(result)
-        } catch (error: any) {
-            res.status(500).json(createResponse(null, 0, 500, '견적서 수정 중 오류가 발생했습니다.' + '[' + error.message + ']'))
-        }
-    },
+    //         const { estimateId } = req.params
+    //         const result = await estimateService.updateEstimate(id, estimateId, req.body)
+    //         res.status(result.resultCd === 201 ? 200 : 400).json(result)
+    //     } catch (error: any) {
+    //         res.status(500).json(createResponse(null, 0, 500, '견적서 수정 중 오류가 발생했습니다.' + '[' + error.message + ']'))
+    //     }
+    // },
 
     // 견적서 삭제
     async deleteEstimate(req: Request, res: Response) {

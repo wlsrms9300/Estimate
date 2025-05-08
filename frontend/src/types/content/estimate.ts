@@ -18,6 +18,7 @@ export interface EstimateItem {
  * @description 견적서 폼
  */
 export interface EstimateForm {
+    estimateId: number
     title: string
     managerName: string
     ceoName: string
